@@ -77,6 +77,18 @@ The uber-jar is also published to Maven Central:
 io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner
 ----
 
+== Dashboard Generation
+
+When you enable *Create Dashboard* in the web UI, the AI module generates a Grafana dashboard tailored to the issues it found and writes the JSON file directly into your application's `src/main/resources/META-INF/dashboards/` directory via Dev MCP.
+
+To use the generated dashboard:
+
+. Run an analysis with *Create Dashboard* checked
+. Restart your application -- Quarkus automatically provisions the dashboard into your Grafana instance
+. Open Grafana and find the new dashboard in the dashboards list
+
+No manual import needed -- the dashboard appears automatically after restart, with panels for the specific metrics and patterns the analysis identified (JVM memory, CPU usage, HTTP latency, error rates, etc.).
+
 == Manual LGTM (without DevServices)
 
 To connect to an externally started LGTM stack instead of using Dev Services:

@@ -22,6 +22,33 @@ Optionally, it can also:
 
 The key insight is the data pipeline. Raw telemetry from MCP is noisy -- SDK metadata, localhost attributes, histogram buckets, Netty internals, per-region breakdowns. A `StripMcpClient` decorator filters this aggressively (94% reduction on metrics: 586 entries down to ~35) before it reaches the LLM, keeping the context window focused on signals that matter.
 
+== How to Try It
+
+Clone the repo, set an API key, and start analyzing in under a minute:
+
+[source,bash]
+----
+git clone https://github.com/quarkiverse/quarkus-telemetry-ai.git
+cd quarkus-telemetry-ai
+
+export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
+
+# Start the AI module — Dev Services auto-starts an LGTM stack
+./dev-ai.sh 8081,8082
+----
+
+The `app.ports` argument lists the ports of your running applications. The AI module will connect to them via Dev MCP for source examination and dashboard generation. Open `http://localhost:8080`, pick how many traces to analyze, and hit *Analyze*.
+
+If you already have an LGTM stack running, use the production uber-jar instead:
+
+[source,bash]
+----
+./mvn.ai.sh package -DskipTests
+./run-ai.sh 8081,8082 http://localhost:3000 http://localhost:3200
+----
+
+The rest of this post dives into the architecture, analysis pipeline, and how we test all of this with chaos engineering.
+
 == Architecture
 
 The system has a layered architecture connecting monitored applications to the AI analysis engine through an observability stack:
@@ -131,41 +158,7 @@ LLM-->>AI: Dashboard JSON
 end
 ----
 
-== Running It
-
-=== Dev Mode (Recommended for Getting Started)
-
-The easiest way to try Telemetry AI is dev mode, which auto-starts an LGTM stack via Quarkus Dev Services:
-
-[source,bash]
-----
-git clone https://github.com/quarkiverse/quarkus-telemetry-ai.git
-cd quarkus-telemetry-ai
-
-export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
-
-# Start the AI module pointing at your application ports
-./dev-ai.sh 8081,8082
-----
-
-Dev Services automatically starts a Grafana LGTM container (Tempo, Loki, Prometheus) -- no Docker Compose or manual setup needed. The `app.ports` argument tells the AI module which of your application ports to connect to for source examination and dashboard generation via Dev MCP.
-
-=== Production Mode (Existing LGTM)
-
-For connecting to an existing LGTM instance, use the pre-built uber-jar:
-
-[source,bash]
-----
-# Build
-./mvn.ai.sh package -DskipTests
-
-# Run
-./run-ai.sh 8081,8082 http://localhost:3000 http://localhost:3200
-----
-
-The uber-jar is also published to Maven Central as `io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner`.
-
-=== LLM Provider Selection
+== LLM Provider Selection
 
 Telemetry AI supports multiple LLM providers via Maven/Quarkus profiles:
 
@@ -190,7 +183,7 @@ The interface provides:
 * *Traces* -- number of recent traces to analyze (1-20)
 * *Output Format* -- HTML, Markdown, Plain Text, or AsciiDoc
 * *Examine Source* -- include source code examination via Dev MCP
-* *Create Dashboard* -- generate a Grafana dashboard JSON from findings
+* *Create Dashboard* -- generate a Grafana dashboard tailored to the issues found
 
 After clicking *Analyze*, the UI shows a performance stats bar (duration, LLM calls, input/output tokens) and three collapsible result sections:
 
@@ -205,6 +198,19 @@ image::images/screenshot-dashboard-generation.png[Dashboard Generation]
 _Generated Grafana dashboard with JVM, CPU, and application metrics panels_
 
 Each section has a *Copy* button for clipboard export.
+
+=== Dashboard Generation
+
+When you enable *Create Dashboard*, the AI module doesn't just show you the dashboard JSON -- it writes it directly into your application's source tree via Dev MCP. The generated dashboard includes panels for the specific metrics and patterns the analysis identified (JVM memory, CPU usage, HTTP latency, error rates, etc.).
+
+To use the generated dashboard:
+
+. Check *Create Dashboard* in the UI and run the analysis
+. The AI module writes the dashboard JSON file into your application's `src/main/resources/META-INF/dashboards/` directory
+. Restart your application -- Quarkus automatically provisions the dashboard into your Grafana instance
+. Open Grafana and find the new dashboard in the dashboards list
+
+No manual import needed -- the dashboard appears automatically after restart, pre-configured with the panels most relevant to your application's telemetry patterns.
 
 == Testing with Chaos Engineering
 
