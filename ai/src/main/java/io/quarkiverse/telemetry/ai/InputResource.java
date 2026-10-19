@@ -13,6 +13,10 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +49,20 @@ public class InputResource {
     @ConfigProperty(name = "quarkus.profile", defaultValue = "unknown")
     String activeProfile;
 
+    @ConfigProperty(name = "app.ports")
+    Optional<List<Integer>> appPorts;
+
     void onStart(@Observes StartupEvent event) {
         String modelName = chatModel.defaultRequestParameters().modelName();
         log.info("AI provider active: profile={}, model={}", activeProfile, modelName);
+    }
+
+    @GET
+    @Path("/config")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Object> config() {
+        boolean hasAppPorts = appPorts.isPresent() && !appPorts.get().isEmpty();
+        return Map.of("hasAppPorts", hasAppPorts);
     }
 
     @GET

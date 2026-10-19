@@ -6,6 +6,12 @@ That's what **Telemetry AI** does. It's an open-source Quarkus application that 
 
 This post walks through how it works, how to run it, and how we test it using chaos engineering with LLM-as-judge evaluation.
 
+## Who Is This For
+
+Telemetry AI is built for developers who work with distributed systems but don't want to become observability experts. You know your LGTM stack is collecting traces, logs, and metrics — but correlating them across services, spotting the root cause in a wall of spans, and distinguishing symptoms from causes takes experience and time. The AI handles that for you: it knows how to query Tempo, Loki, and Prometheus, understands what the telemetry means in context, and draws correlations that would take manual investigation to piece together.
+
+If you're comfortable with AI but not with the details of trace propagation, span hierarchies, or PromQL — this tool bridges that gap.
+
 ## What It Does
 
 Telemetry AI is a standalone analysis engine. Point it at your LGTM stack and your running applications, and it will:
@@ -36,14 +42,16 @@ export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
 ./dev-ai.sh 8081,8082
 ```
 
-The `app.ports` argument lists the ports of your running applications. The AI module will connect to them via Dev MCP for source examination and dashboard generation. Open `http://localhost:8080`, pick how many traces to analyze, and hit **Analyze**.
+The `app.ports` argument is optional — it lists the ports of your running Quarkus applications. When provided, the AI module connects to them via Dev MCP, enabling source code examination and writing generated Grafana dashboards directly into your application sources. This requires the target applications to be running in Quarkus dev mode (which exposes the Dev MCP endpoint). Without ports, the core analysis (traces, logs, metrics) works the same — the Examine Source button is simply disabled in the UI.
 
 If you already have an LGTM stack running, use the production uber-jar instead:
 
 ```bash
 ./mvn.ai.sh package -DskipTests
-./run-ai.sh 8081,8082 http://localhost:3000 http://localhost:3200
+./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082
 ```
+
+The ports argument is optional here too. Open `http://localhost:8080`, pick how many traces to analyze, and hit **Analyze**.
 
 The rest of this post dives into the architecture, analysis pipeline, and how we test all of this with chaos engineering.
 
@@ -173,16 +181,11 @@ Each section has a **Copy** button for clipboard export.
 
 ### Dashboard Generation
 
-When you enable **Create Dashboard**, the AI module doesn't just show you the dashboard JSON — it writes it directly into your application's source tree via Dev MCP. The generated dashboard includes panels for the specific metrics and patterns the analysis identified (JVM memory, CPU usage, HTTP latency, error rates, etc.).
+When you enable **Create Dashboard**, the AI module generates a Grafana dashboard with panels tailored to the issues it found (JVM memory, CPU usage, HTTP latency, error rates, etc.).
 
-To use the generated dashboard:
+In **dev mode** (with `app.ports` configured), the AI module writes the dashboard JSON directly into your application's source tree via Dev MCP — into `src/main/resources/META-INF/dashboards/`. Just restart your application, and Quarkus automatically provisions the dashboard into your Grafana instance. No manual import needed — the dashboard appears in Grafana's dashboard list, pre-configured with the panels most relevant to your application's telemetry patterns.
 
-1. Check **Create Dashboard** in the UI and run the analysis
-2. The AI module writes the dashboard JSON file into your application's `src/main/resources/META-INF/dashboards/` directory
-3. Restart your application — Quarkus automatically provisions the dashboard into your Grafana instance
-4. Open Grafana and find the new dashboard in the dashboards list
-
-No manual import needed — the dashboard appears automatically after restart, pre-configured with the panels most relevant to your application's telemetry patterns.
+In **production mode** (uber-jar without `app.ports`), the dashboard JSON is still generated and displayed in the UI's Dashboard section, where you can copy it and import it into Grafana manually.
 
 ## Testing with Chaos Engineering
 

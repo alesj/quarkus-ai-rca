@@ -280,7 +280,7 @@
                         <option value="asciidoc">AsciiDoc</option>
                     </select>
                 </div>
-                <div class="checkbox-group">
+                <div class="checkbox-group" id="examine-source-group">
                     <input type="checkbox" id="examine-source">
                     <label for="examine-source">Examine Source</label>
                 </div>
@@ -344,9 +344,23 @@
         const loading = document.getElementById('loading');
         const elapsedEl = document.getElementById('elapsed');
         const errorMsg = document.getElementById('error-msg');
+        const examineSourceCheckbox = document.getElementById('examine-source');
+        const examineSourceGroup = document.getElementById('examine-source-group');
         let rawAnalysis = '';
         let rawSources = '';
         let dashboardJson = '';
+
+        fetch('/config')
+            .then(r => r.json())
+            .then(cfg => {
+                if (!cfg.hasAppPorts) {
+                    examineSourceCheckbox.disabled = true;
+                    examineSourceCheckbox.checked = false;
+                    examineSourceGroup.title = 'Requires app.ports configuration (Dev MCP)';
+                    examineSourceGroup.style.opacity = '0.4';
+                }
+            })
+            .catch(() => {});
 
         function copyToClipboard(text, button) {
             const showFeedback = (msg) => {

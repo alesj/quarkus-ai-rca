@@ -108,15 +108,17 @@ You can check any app's DevUI on where the Grafana / LGTM is available - for any
 To quickly start just the AI module with Dev Services (LGTM auto-starts):
 
 ```bash
-./dev-ai.sh 8081,8082
+./dev-ai.sh              # analysis only (no source exam / dashboard write)
+./dev-ai.sh 8081,8082    # with Dev MCP for source exam + dashboard generation
 ```
 
-This runs the AI module in Quarkus dev mode, automatically starting LGTM via Dev Services. The ports argument tells the AI module which companion app ports to connect to via Dev MCP.
+This runs the AI module in Quarkus dev mode, automatically starting LGTM via Dev Services. The ports argument is optional — it tells the AI module which application ports to connect to via Dev MCP for source examination and writing dashboards into your app sources. The target applications must be running in Quarkus dev mode (which exposes the Dev MCP endpoint).
 
 For production use with an existing LGTM instance, use the pre-built uber-jar:
 
 ```bash
-./run-ai.sh 8081,8082 http://localhost:3000 http://localhost:3200
+./run-ai.sh http://localhost:3000 http://localhost:3200              # analysis only
+./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082    # with app ports
 ```
 
 The uber-jar can also be downloaded from Maven Central as `io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner`.
