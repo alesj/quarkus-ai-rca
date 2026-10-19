@@ -9,20 +9,20 @@
         <version>22</version>
     </parent>
 
-    <groupId>io.quarkiverse.telemetry</groupId>
-    <artifactId>telemetry-ai-build</artifactId>
+    <groupId>io.quarkiverse.ai.rca</groupId>
+    <artifactId>quarkus-ai-rca-parent</artifactId>
     <version>0.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Telemetry AI Build</name>
-    <description>Root build for telemetry app and AI infrastructure modules</description>
+    <name>Quarkus AI RCA Build</name>
+    <description>AI-powered Root Cause Analysis for distributed systems</description>
 
-    <url>https://github.com/quarkiverse/quarkus-telemetry-ai</url>
+    <url>https://github.com/quarkiverse/quarkus-ai-rca</url>
 
     <scm>
-        <connection>scm:git:git@github.com:quarkiverse/quarkus-telemetry-ai.git</connection>
-        <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-telemetry-ai.git</developerConnection>
-        <url>https://github.com/quarkiverse/quarkus-telemetry-ai</url>
+        <connection>scm:git:git@github.com:quarkiverse/quarkus-ai-rca.git</connection>
+        <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-ai-rca.git</developerConnection>
+        <url>https://github.com/quarkiverse/quarkus-ai-rca</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -44,10 +44,10 @@
         <!-- Quarkus -->
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.40.1</quarkus.platform.version>
+        <quarkus.platform.version>3.40.1.1</quarkus.platform.version>
 
         <!-- LangChain4j directly, when needed -->
-        <quarkus.langchain4j.version>1.14.1</quarkus.langchain4j.version>
+        <quarkus.langchain4j.version>1.14.2</quarkus.langchain4j.version>
 
         <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

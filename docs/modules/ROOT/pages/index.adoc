@@ -1,10 +1,10 @@
-= Telemetry AI
+= AI Root Cause Analysis
 
 LLM-powered root-cause analysis of distributed telemetry data.
 
 == What It Is
 
-Telemetry AI is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
+AI Root Cause Analysis (AI RCA) is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
 
 == Architecture
 
@@ -43,7 +43,7 @@ style LLMs fill:#f5f5f5,stroke:#bbb
 
 The AI module connects to your existing LGTM stack via MCP and to your running Quarkus applications via Dev MCP (for source examination and dashboard generation). Your applications just need OpenTelemetry instrumentation -- no code changes required.
 
-The AI module is available as an uber-jar on Maven Central (`io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner`).
+The AI module is available as an uber-jar on Maven Central (`io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner`).
 
 == Analysis Pipeline
 

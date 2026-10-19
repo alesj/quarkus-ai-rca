@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.telemetry</groupId>
-        <artifactId>telemetry-ai-build</artifactId>
+        <groupId>io.quarkiverse.ai.rca</groupId>
+        <artifactId>quarkus-ai-rca-parent</artifactId>
         <version>0.1.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>telemetry-ai-app</artifactId>
+    <artifactId>quarkus-ai-rca-app</artifactId>
     <packaging>quarkus</packaging>
 
-    <name>Telemetry AI Application</name>
+    <name>Quarkus AI RCA Application</name>
     <description>Main Quarkus runtime application</description>
 
     <!-- ===================== -->

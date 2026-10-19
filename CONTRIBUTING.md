@@ -1,4 +1,4 @@
-# Contributing to Telemetry AI
+# Contributing to AI Root Cause Analysis
 
 ## Prerequisites
 

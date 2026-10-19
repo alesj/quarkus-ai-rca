@@ -1,9 +1,9 @@
-# Telemetry AI
+# AI Root Cause Analysis (AI RCA)
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.telemetry/telemetry-ai.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.telemetry/telemetry-ai)
+[![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.ai.rca/quarkus-ai-rca-core.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.ai.rca/quarkus-ai-rca-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-LLM-powered root-cause analysis of distributed telemetry data using Quarkus, LangChain4j, and Grafana LGTM via MCP.
+LLM-powered Root Cause Analysis of distributed systems using Quarkus, LangChain4j, and Grafana LGTM via MCP.
 
 For detailed documentation, see the [docs](docs/modules/ROOT/pages/index.adoc).
 
@@ -121,7 +121,7 @@ For production use with an existing LGTM instance, use the pre-built uber-jar:
 ./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082    # with app ports
 ```
 
-The uber-jar can also be downloaded from Maven Central as `io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner`.
+The uber-jar can also be downloaded from Maven Central as `io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner`.
 
 ### Manual LGTM (without DevServices)
 
@@ -150,7 +150,7 @@ Then run each Quarkus app with the `lgtm` profile. The `ai` module also needs an
 
 ## Web UI
 
-Once the `ai` app is running (step 3), open `http://localhost:8080` in a browser to access the **Telemetry AI Analysis** web UI.
+Once the `ai` app is running (step 3), open `http://localhost:8080` in a browser to access the **AI Root Cause Analysis** web UI.
 
 The UI provides:
 * **Traces** — number of recent traces to analyze (1–20)

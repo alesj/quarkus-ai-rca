@@ -2,7 +2,7 @@
 
 == Overview
 
-Telemetry AI includes 19 end-to-end integration test scenarios that exercise the full stack: monitored apps generate telemetry under controlled failure conditions, the AI module analyzes it, and an LLM-as-judge scores the analysis quality (threshold: 70/100).
+AI RCA includes 19 end-to-end integration test scenarios that exercise the full stack: monitored apps generate telemetry under controlled failure conditions, the AI module analyzes it, and an LLM-as-judge scores the analysis quality (threshold: 70/100).
 
 == Running Tests
 

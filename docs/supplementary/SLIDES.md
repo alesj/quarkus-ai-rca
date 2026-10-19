@@ -74,7 +74,7 @@ style: |
 
 <!-- _class: title -->
 
-# Telemetry AI
+# AI Root Cause Analysis
 
 LLM-powered root-cause analysis of distributed telemetry
 
@@ -381,13 +381,14 @@ All 19 scenarios pass across tested provider combinations:
 ### Next Steps
 - Anthropic provider integration
 - Native image compilation
+- Additional observability backends (Datadog, Elastic, New Relic) — new MCP tool providers, same analysis pipeline and evaluation framework
 
 ---
 
 # Release Roadmap
 
 ### 🏠 Project Home
-- Establish as a **top-level Quarkiverse project** (e.g. `quarkiverse/quarkus-telemetry-ai`)
+- Establish as a **top-level Quarkiverse project** (e.g. `quarkiverse/quarkus-ai-rca`)
 - Dedicated GitHub org with CI/CD, issue tracking, and release automation
 - Align with Quarkiverse governance: extension registry, compatibility matrix
 

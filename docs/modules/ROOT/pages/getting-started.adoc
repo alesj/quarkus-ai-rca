@@ -14,8 +14,8 @@ The fastest way to get started is running the AI module in dev mode. Quarkus Dev
 
 [source,bash]
 ----
-git clone https://github.com/quarkiverse/quarkus-telemetry-ai.git
-cd quarkus-telemetry-ai
+git clone https://github.com/quarkiverse/quarkus-ai-rca.git
+cd quarkus-ai-rca
 
 export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
 
@@ -74,7 +74,7 @@ The uber-jar is also published to Maven Central:
 
 [source]
 ----
-io.quarkiverse.telemetry:telemetry-ai-core:<version>:jar:runner
+io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner
 ----
 
 == Dashboard Generation

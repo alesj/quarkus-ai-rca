@@ -1,3 +1,3 @@
 #!/bin/bash -v
 
-./mvnw --projects :telemetry-ai-app --also-make $*
+./mvnw --projects :quarkus-ai-rca-app --also-make $*

@@ -1,8 +1,8 @@
-# Telemetry AI - Project Overview
+# AI Root Cause Analysis - Project Overview
 
 ## What It Is
 
-Telemetry AI is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
+AI Root Cause Analysis is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
 
 ## Architecture
 
@@ -148,9 +148,9 @@ The project needs a permanent home to enable community adoption and long-term ma
 
 | Option | Approach | Pros | Cons |
 |--------|----------|------|------|
-| **Quarkiverse top-level** | `quarkiverse/quarkus-telemetry-ai` | Extension registry, Quarkus CI, community visibility | Governance requirements, review process |
-| **Red Hat GitHub org** | `redhat/telemetry-ai` | Internal control, enterprise alignment | Narrower community reach |
-| **Standalone** | `telemetry-ai/telemetry-ai` | Full autonomy | Must set up all infrastructure |
+| **Quarkiverse top-level** | `quarkiverse/quarkus-ai-rca` | Extension registry, Quarkus CI, community visibility | Governance requirements, review process |
+| **Red Hat GitHub org** | `redhat/ai-rca` | Internal control, enterprise alignment | Narrower community reach |
+| **Standalone** | `ai-rca/ai-rca` | Full autonomy | Must set up all infrastructure |
 
 **Recommendation:** Quarkiverse top-level project -- leverages the existing Quarkus extension ecosystem, CI templates, and compatibility matrix.
 
@@ -160,8 +160,8 @@ The project needs a permanent home to enable community adoption and long-term ma
 
 | Artifact | Type | Contents |
 |----------|------|----------|
-| `telemetry-ai-core` | **Uberjar** | AI engine, MCP clients, Web UI, system prompts -- single dependency for downstream |
-| `telemetry-ai-app` | Example | Reference chaos application for testing and demos |
+| `quarkus-ai-rca-core` | **Uberjar** | AI engine, MCP clients, Web UI, system prompts -- single dependency for downstream |
+| `quarkus-ai-rca-app` | Example | Reference chaos application for testing and demos |
 
 **Release process:**
 - Semantic versioning with changelogs and migration guides

@@ -4,15 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.quarkiverse.telemetry</groupId>
-        <artifactId>telemetry-ai-build</artifactId>
+        <groupId>io.quarkiverse.ai.rca</groupId>
+        <artifactId>quarkus-ai-rca-parent</artifactId>
         <version>0.1.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>telemetry-ai-core</artifactId>
+    <artifactId>quarkus-ai-rca-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>Telemetry AI Core Module</name>
+    <name>Quarkus AI RCA Core</name>
     <description>AI abstractions and integration layer (no LLM providers)</description>
 
     <!-- ===================== -->

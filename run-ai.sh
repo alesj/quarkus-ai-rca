@@ -15,7 +15,7 @@ PORTS=${3:-}
 shift 3 2>/dev/null || shift 2
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-JAR=$(find "$SCRIPT_DIR/ai/target" -name "telemetry-ai-core-*-runner.jar" -not -name "*sources*" | head -1)
+JAR=$(find "$SCRIPT_DIR/ai/target" -name "quarkus-ai-rca-core-*-runner.jar" -not -name "*sources*" | head -1)
 
 if [ -z "$JAR" ]; then
   echo "Runner jar not found in ai/target/. Build first: ./mvn.ai.sh package -DskipTests"

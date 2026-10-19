@@ -1,5 +1,5 @@
-name: quarkus-telemetry-ai
-title: Telemetry AI
+name: quarkus-ai-rca
+title: AI Root Cause Analysis
 version: dev
 nav:
   - modules/ROOT/nav.adoc
