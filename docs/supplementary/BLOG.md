@@ -44,6 +44,7 @@ curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core
 # Run against your LGTM stack
 java -Dgrafana.endpoint=http://localhost:3000 \
      -Dtempo-mcp.endpoint=http://localhost:3200 \
+     -Dapp.ports=8081,8082 \
      -jar quarkus-ai-rca-core-*-runner.jar
 ```
 
@@ -65,9 +66,9 @@ export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
 
 ### Connecting to Your Applications
 
-The `app.ports` argument (e.g. `8081,8082`) is optional — it lists the ports of your running Quarkus applications. When provided, the AI module connects to them via Dev MCP, enabling source code examination and writing generated Grafana dashboards directly into your application sources. This requires the target applications to be running in Quarkus dev mode (which exposes the Dev MCP endpoint). Without ports, the core analysis (traces, logs, metrics) works the same — the Examine Source button is simply disabled in the UI.
+The `-Dapp.ports` argument (shown as `8081,8082` in the examples above) is optional — it lists the ports of your running Quarkus applications. When provided, the AI module connects to them via Dev MCP, enabling source code examination and writing generated Grafana dashboards directly into your application sources. This requires the target applications to be running in Quarkus dev mode (which exposes the Dev MCP endpoint). Without it, the core analysis (traces, logs, metrics) works the same — the Examine Source button is simply disabled in the UI.
 
-To pass application ports with the Maven Central uber-jar, add `-Dapp.ports=8081,8082` to the `java` command.
+To run without application ports, simply omit `-Dapp.ports` from the `java` command or the ports argument from `./dev-ai.sh`.
 
 ### LLM Provider Selection
 

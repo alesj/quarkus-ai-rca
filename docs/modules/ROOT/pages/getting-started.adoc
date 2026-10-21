@@ -72,10 +72,11 @@ curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core
 # Run against your LGTM stack
 java -Dgrafana.endpoint=http://localhost:3000 \
      -Dtempo-mcp.endpoint=http://localhost:3200 \
+     -Dapp.ports=8081,8082 \
      -jar quarkus-ai-rca-core-*-runner.jar
 ----
 
-To connect to your Quarkus applications for source examination and dashboard generation, add `-Dapp.ports=8081,8082`.
+The `-Dapp.ports` argument is optional -- it lists the ports of your running Quarkus applications in dev mode for source examination and dashboard generation. Omit it if you only need the core analysis (traces, logs, metrics).
 
 Alternatively, if you've cloned the repo, you can build and run locally:
 
