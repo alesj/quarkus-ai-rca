@@ -57,6 +57,8 @@ public class DevMcpToolProviderSupplier implements Supplier<ToolProvider> {
     void checkConfig() {
         if (appPorts.isEmpty()) {
             log.warn("Missing app.ports configuration, Quarkus dev-mcp cannot be used then.");
+        } else {
+            log.info("Using app.ports: {}", appPorts.get());
         }
     }
 
