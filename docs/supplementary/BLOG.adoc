@@ -28,7 +28,31 @@ The key insight is the data pipeline. Raw telemetry from MCP is noisy -- SDK met
 
 == How to Try It
 
-Clone the repo, set an API key, and start analyzing in under a minute:
+=== Quick Start (Maven Central)
+
+If you already have an LGTM stack running, you don't need to clone the repo -- just download the uber-jar from Maven Central and run it:
+
+[source,bash]
+----
+export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
+
+# Option 1: Download via Maven
+mvn dependency:copy -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-core:RELEASE:jar:runner -DoutputDirectory=.
+
+# Option 2: Download via curl (replace VERSION with the latest release)
+curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core/VERSION/quarkus-ai-rca-core-VERSION-runner.jar
+
+# Run against your LGTM stack
+java -Dgrafana.endpoint=http://localhost:3000 \
+     -Dtempo-mcp.endpoint=http://localhost:3200 \
+     -jar quarkus-ai-rca-core-*-runner.jar
+----
+
+Open `http://localhost:8080`, pick how many traces to analyze, and hit *Analyze*. That's it -- no build, no clone, no setup.
+
+=== Developer Mode
+
+For development with Quarkus Dev Services (auto-starts an LGTM stack for you):
 
 [source,bash]
 ----
@@ -41,17 +65,11 @@ export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
 ./dev-ai.sh 8081,8082
 ----
 
-The `app.ports` argument is optional -- it lists the ports of your running Quarkus applications. When provided, the AI module connects to them via Dev MCP, enabling source code examination and writing generated Grafana dashboards directly into your application sources. This requires the target applications to be running in Quarkus dev mode (which exposes the Dev MCP endpoint). Without ports, the core analysis (traces, logs, metrics) works the same -- the Examine Source button is simply disabled in the UI.
+=== Connecting to Your Applications
 
-If you already have an LGTM stack running, use the production uber-jar instead:
+The `app.ports` argument (e.g. `8081,8082`) is optional -- it lists the ports of your running Quarkus applications. When provided, the AI module connects to them via Dev MCP, enabling source code examination and writing generated Grafana dashboards directly into your application sources. This requires the target applications to be running in Quarkus dev mode (which exposes the Dev MCP endpoint). Without ports, the core analysis (traces, logs, metrics) works the same -- the Examine Source button is simply disabled in the UI.
 
-[source,bash]
-----
-./mvn.ai.sh package -DskipTests
-./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082
-----
-
-The ports argument is optional here too. Open `http://localhost:8080`, pick how many traces to analyze, and hit *Analyze*.
+To pass application ports with the Maven Central uber-jar, add `-Dapp.ports=8081,8082` to the `java` command.
 
 === LLM Provider Selection
 
@@ -116,6 +134,6 @@ AI Root Cause Analysis is a https://github.com/quarkiverse/quarkus-ai-rca[Quarki
 * *Additional observability backends* — currently the project connects to Grafana LGTM via MCP, but the analysis pipeline, system prompt, and evaluation framework are backend-agnostic. Supporting platforms like Datadog, Elastic, or New Relic is primarily a matter of introducing new MCP tool providers for their APIs; the core analysis logic and test harness stay the same
 * *Community feedback* on analysis quality and usefulness across different application architectures
 
-Try it out: clone the repo, set an API key, run `./dev-ai.sh 8081,8082`, poke some endpoints, and see what the AI finds.
+Try it out: grab the uber-jar from Maven Central (or clone the repo for dev mode), set an API key, point it at your LGTM stack, and see what the AI finds.
 
 For a deep dive into the architecture, analysis pipeline, and how we test this with chaos engineering and LLM-as-judge evaluation, see the link:BLOG-DEEP-DIVE.adoc[companion post].

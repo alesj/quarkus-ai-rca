@@ -387,23 +387,21 @@ All 19 scenarios pass across tested provider combinations:
 
 # Release Roadmap
 
-### 🏠 Project Home
-- Establish as a **top-level Quarkiverse project** (e.g. `quarkiverse/quarkus-ai-rca`)
-- Dedicated GitHub org with CI/CD, issue tracking, and release automation
-- Align with Quarkiverse governance: extension registry, compatibility matrix
+### ✅ Project Home
+- **Top-level Quarkiverse project**: [`quarkiverse/quarkus-ai-rca`](https://github.com/quarkiverse/quarkus-ai-rca)
+- GitHub CI/CD, issue tracking, and release automation
+- Aligned with Quarkiverse governance: extension registry, compatibility matrix
 
-### 📦 Distribution
-- Publish **AI module as an uberjar** to Maven Central
+### ✅ Distribution
+- **AI module uberjar** published to Maven Central
+  - `io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner`
   - Self-contained artifact: AI engine + MCP clients + Web UI
-  - Single dependency for downstream consumers
-- Versioned releases with changelogs and migration guides
+- Versioned releases with changelogs
 
-### 📖 Documentation
-- **Build pipeline**: Antora or MkDocs site generated from `docs/` sources
-- **Hosting**: GitHub Pages or Quarkiverse docs portal
+### ✅ Documentation
+- **Antora** site generated from `docs/` sources
+- **Hosted** at [docs.quarkiverse.io/quarkus-ai-rca](https://docs.quarkiverse.io/quarkus-ai-rca/dev/index.html)
 - **Content**: Getting started guide, configuration reference, chaos type catalog, API docs
-- **Slides**: Auto-build `slides.html` from `SLIDES.md` via Marp in CI
-- **Update workflow**: PRs that touch `docs/` trigger preview builds
 
 ---
 

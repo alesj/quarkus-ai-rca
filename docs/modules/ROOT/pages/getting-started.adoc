@@ -59,22 +59,30 @@ curl http://localhost:8080/analyze/5   # analyze last 5 traces
 
 == Production Mode (Uber-jar)
 
-For connecting to an existing LGTM instance without dev mode, use the pre-built uber-jar:
+The uber-jar is published to Maven Central -- you don't need to clone the repo. Download it and run directly:
 
 [source,bash]
 ----
-# Build locally
+# Option 1: Download via Maven
+mvn dependency:copy -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-core:RELEASE:jar:runner -DoutputDirectory=.
+
+# Option 2: Download via curl (replace VERSION with the latest release)
+curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core/VERSION/quarkus-ai-rca-core-VERSION-runner.jar
+
+# Run against your LGTM stack
+java -Dgrafana.endpoint=http://localhost:3000 \
+     -Dtempo-mcp.endpoint=http://localhost:3200 \
+     -jar quarkus-ai-rca-core-*-runner.jar
+----
+
+To connect to your Quarkus applications for source examination and dashboard generation, add `-Dapp.ports=8081,8082`.
+
+Alternatively, if you've cloned the repo, you can build and run locally:
+
+[source,bash]
+----
 ./mvn.ai.sh package -DskipTests
-
-# Run with existing LGTM
 ./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082
-----
-
-The uber-jar is also published to Maven Central:
-
-[source]
-----
-io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner
 ----
 
 == Dashboard Generation
