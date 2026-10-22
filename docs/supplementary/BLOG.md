@@ -26,11 +26,36 @@ Optionally, it can also:
 
 The key insight is the data pipeline. Raw telemetry from MCP is noisy — SDK metadata, localhost attributes, histogram buckets, Netty internals, per-region breakdowns. A `StripMcpClient` decorator filters this aggressively (94% reduction on metrics: 586 entries down to ~35) before it reaches the LLM, keeping the context window focused on signals that matter.
 
+## A Quick Example
+
+To make this concrete, here's what it looks like in practice. Say you have two services — a proxy that forwards requests to a backend app — and the backend starts returning HTTP 500 errors. You'd normally open Grafana, find the failing traces in Tempo, pull up logs in Loki, check Prometheus for resource pressure, and piece together whether it's a code bug, infrastructure issue, or something in between.
+
+With AI Root Cause Analysis, you trigger a few requests against your proxy:
+
+```bash
+curl http://localhost:8081/poke?value=500
+curl http://localhost:8081/poke?value=500
+curl http://localhost:8081/poke?value=200
+```
+
+Then open `http://localhost:8080` and click **Analyze**. The AI retrieves the recent traces, pulls correlated logs and metrics, and produces a report like this (abbreviated):
+
+> **Trace ID:** abc123def456
+> **Duration:** 85ms | **Status:** Error — HTTP 500
+>
+> **Root cause:** The backend application (`app`) threw a `WebApplicationException` with status 500. The proxy forwarded this error to the caller. All infrastructure metrics are normal (CPU 5%, memory 37%, worker threads available) — this is an application-level error, not a resource issue.
+>
+> **Causal chain:** Client request → proxy forwarded to app → app returned HTTP 500 (trace: server span with `STATUS_CODE_ERROR`) → log: `"App error: 500"` → proxy propagated the error to caller.
+>
+> **Severity:** MEDIUM — Errors are occurring but the system is otherwise healthy. Investigate the application logic that returns 500 for the given input.
+
+The analysis distinguishes root causes from symptoms, tells you what metrics *rule out* (no CPU pressure, no memory issues, no thread contention), and gives actionable next steps — all from the same telemetry your LGTM stack was already collecting.
+
 ## How to Try It
 
 ### Quick Start (Maven Central)
 
-If you already have an LGTM stack running, you don't need to clone the repo — just download the uber-jar from Maven Central and run it:
+If you already have an LGTM stack running, you don't need to clone the repo — just download the uber-jar from Maven Central and run it. The AI module needs two endpoints from your LGTM stack: **Grafana** (default port 3000) for querying logs and metrics via MCP, and **Tempo** (default port 3200) for retrieving distributed traces via MCP.
 
 ```bash
 export OPENAI_API_KEY=sk-...   # or GROK_API_KEY for Grok
@@ -41,7 +66,7 @@ mvn dependency:copy -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-core:RELEASE
 # Option 2: Download via curl (replace VERSION with the latest release)
 curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core/VERSION/quarkus-ai-rca-core-VERSION-runner.jar
 
-# Run against your LGTM stack
+# Run against your LGTM stack (Grafana on 3000, Tempo on 3200)
 java -Dgrafana.endpoint=http://localhost:3000 \
      -Dtempo-mcp.endpoint=http://localhost:3200 \
      -Dapp.ports=8081,8082 \
@@ -96,11 +121,11 @@ The interface provides:
 - **Examine Source** — include source code examination via Dev MCP
 - **Create Dashboard** — generate a Grafana dashboard tailored to the issues found
 
-After clicking **Analyze**, the UI shows a performance stats bar (duration, LLM calls, input/output tokens) and three collapsible result sections:
+After clicking **Analyze**, the UI shows a performance stats bar (duration, LLM calls, input/output tokens) and up to three collapsible result sections:
 
-1. **Analysis** — the main telemetry analysis with per-trace root cause, error patterns, latency breakdown, and cross-trace correlation
-2. **Examined Sources** — source code snippets linked to analysis findings, rendered as Markdown
-3. **Dashboard** — generated Grafana dashboard definition as JSON
+1. **Analysis** — the main telemetry analysis with per-trace root cause, error patterns, latency breakdown, and cross-trace correlation. This is always present.
+2. **Examined Sources** — when you enable the *Examine Source* option, the AI reads your application's source code via Dev MCP and correlates analysis findings back to specific classes and methods. This section shows the relevant source snippets alongside the AI's explanation of how each code path relates to the issues it found. (Requires the target applications to be running in Quarkus dev mode — see [Connecting to Your Applications](#connecting-to-your-applications).)
+3. **Dashboard** — when you enable *Create Dashboard*, the AI generates a Grafana dashboard JSON tailored to the issues it detected. You can import this directly into Grafana to get panels for the metrics most relevant to your application — JVM memory, HTTP error rates, latency percentiles, and more. (See [Dashboard Generation](#dashboard-generation) below for how this works in dev mode vs. production.)
 
 ![Source Examination](images/screenshot-source-examination.png)
 *Source examination correlates analysis findings back to application code*
