@@ -1,3 +1,5 @@
+:kroki-fetch-diagram: true
+
 = AI Root Cause Analysis
 
 LLM-powered root-cause analysis of distributed telemetry data.
