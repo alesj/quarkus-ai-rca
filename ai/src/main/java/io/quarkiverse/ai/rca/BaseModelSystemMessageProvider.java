@@ -6,8 +6,6 @@ import io.quarkiverse.langchain4j.runtime.aiservice.SystemMessageProviderWithCon
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import org.jboss.logging.Logger;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +34,6 @@ public abstract class BaseModelSystemMessageProvider implements SystemMessagePro
 
     protected abstract String getSystemMessage(String key);
 
-    @Nullable
     protected String loadSystemMessage(String key) {
         InputStream is = getClass().getClassLoader().getResourceAsStream(key + ".txt");
         if (is != null) {

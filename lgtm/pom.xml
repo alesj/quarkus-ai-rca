@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.quarkiverse.ai.rca</groupId>
+        <artifactId>quarkus-ai-rca-parent</artifactId>
+        <version>0.1.5-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>quarkus-ai-rca-lgtm</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Quarkus AI RCA LGTM Platform</name>
+    <description>LGTM (Loki, Grafana, Tempo, Mimir) observability platform implementation</description>
+
+    <dependencies>
+
+        <!-- SPI -->
+        <dependency>
+            <groupId>io.quarkiverse.ai.rca</groupId>
+            <artifactId>quarkus-ai-rca-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- LangChain4j MCP -->
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-mcp</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

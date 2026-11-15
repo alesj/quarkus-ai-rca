@@ -1,7 +1,5 @@
 package io.quarkiverse.ai.rca;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,7 +10,6 @@ public class DynamicModelSystemMessageProvider extends BaseModelSystemMessagePro
 
     private final Map<String, String> msgMap = new ConcurrentHashMap<>();
 
-    @Nullable
     protected String getSystemMessage(String key) {
         String msg = msgMap.computeIfAbsent(key, this::loadSystemMessage);
         capture().accept(msg);

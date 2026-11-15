@@ -99,11 +99,6 @@ METHODS=$(IFS=+; echo "${VALIDATED[*]}")
 
 export AI="$PROFILE"
 
-case "$PROFILE" in
-  grok) MAVEN_PROFILE="openai" ;;
-  *)    MAVEN_PROFILE="$PROFILE" ;;
-esac
-
 case "$SCORER" in
   grok)
     export SCORER_BASE_URL=https://api.x.ai/v1
@@ -130,5 +125,5 @@ echo "  Threshold: ${EVALUATION_THRESHOLD:-70 (default)}"
 echo "  Methods: $METHODS"
 echo ""
 
-./mvnw clean test -pl ai -P"$MAVEN_PROFILE" -Dintegration.run=true \
-  -Dtest="${TEST_CLASS}#${METHODS}" $THRESHOLD_ARG
+./mvnw clean test -pl ai --also-make -Dllm.provider="$PROFILE" -Dintegration.run=true \
+  -Dtest="${TEST_CLASS}#${METHODS}" -Dsurefire.failIfNoSpecifiedTests=false $THRESHOLD_ARG

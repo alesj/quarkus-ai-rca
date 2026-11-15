@@ -223,11 +223,11 @@ Generated Grafana dashboard JSON with JVM Memory, CPU Usage, and application met
 | **WatsonX** | Granite | ⚙️ Configured | JSON validator guardrail |
 | **Anthropic** | — | 🔧 Planned | API key config exists |
 
-Profile-based selection via Maven + Quarkus profiles:
+Property-based selection (defaults in `.mvn/maven.config`):
 ```bash
-./mvn.ai.sh quarkus:dev           # OpenAI (default)
-./mvn.ai.sh quarkus:dev -Pgrok    # Grok/xAI
-./mvn.ai.sh quarkus:dev -Pgemini  # Gemini
+./mvn.ai.sh quarkus:dev                        # OpenAI (default)
+./mvn.ai.sh quarkus:dev -Dllm.provider=grok    # Grok/xAI
+./mvn.ai.sh quarkus:dev -Dllm.provider=gemini  # Gemini
 ```
 
 ---

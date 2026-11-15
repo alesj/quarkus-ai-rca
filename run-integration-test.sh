@@ -18,12 +18,6 @@ case "$TEST_TYPE" in
     ;;
 esac
 
-# Map AI profile to Maven profile (grok reuses openai's dependency)
-case "$PROFILE" in
-  grok) MAVEN_PROFILE="openai" ;;
-  *)    MAVEN_PROFILE="$PROFILE" ;;
-esac
-
 # Configure scorer model (defaults to OpenAI via application.properties if unset)
 case "$SCORER" in
   grok)
@@ -50,4 +44,4 @@ echo "  Scorer: ${SCORER:-openai (default)}"
 echo "  Threshold: ${EVALUATION_THRESHOLD:-70 (default)}"
 echo ""
 
-./mvnw clean test -pl ai -P"$MAVEN_PROFILE" -Dintegration.run=true -Dtest="$TEST_CLASS" $THRESHOLD_ARG
+./mvnw clean test -pl ai --also-make -Dllm.provider="$PROFILE" -Dintegration.run=true -Dtest="$TEST_CLASS" -Dsurefire.failIfNoSpecifiedTests=false $THRESHOLD_ARG

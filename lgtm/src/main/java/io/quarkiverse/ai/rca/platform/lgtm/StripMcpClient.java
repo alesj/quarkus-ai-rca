@@ -1,4 +1,4 @@
-package io.quarkiverse.ai.rca;
+package io.quarkiverse.ai.rca.platform.lgtm;
 
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
@@ -59,15 +59,11 @@ public class StripMcpClient implements McpClient {
             InvocationContext invocationContext) {
         System.out.println("MCP Tool Call: " + executionRequest.name() + " with args: " + executionRequest.arguments());
         ToolExecutionResult result = delegate.executeTool(executionRequest, invocationContext);
-        //System.out.println("rawRes = " + result.resultText());
 
-        // Choose the appropriate stripping function based on tool name
         Function<ToolExecutionResult, ToolExecutionResult> stripFn = toolSpecificFns.getOrDefault(executionRequest.name(),
                 defaultFn);
 
-        ToolExecutionResult transformed = stripFn.apply(result);
-        //System.out.println("transformedRes = " + transformed.resultText());
-        return transformed;
+        return stripFn.apply(result);
     }
 
     @Override

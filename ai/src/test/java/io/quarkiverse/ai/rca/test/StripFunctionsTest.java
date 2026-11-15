@@ -1,6 +1,6 @@
 package io.quarkiverse.ai.rca.test;
 
-import io.quarkiverse.ai.rca.StripFunctions;
+import io.quarkiverse.ai.rca.platform.lgtm.LgtmStripFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ class StripFunctionsTest {
         }
 
         // Extract root span start time
-        String startTime = StripFunctions.extractRootSpanStartTime(traceJson);
+        String startTime = LgtmStripFunctions.extractRootSpanStartTime(traceJson);
 
         // Verify result
         assertNotNull(startTime, "Root span start time should not be null");
@@ -33,24 +33,24 @@ class StripFunctionsTest {
 
     @Test
     void testExtractRootSpanStartTime_NullInput() {
-        assertNull(StripFunctions.extractRootSpanStartTime(null));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime(null));
     }
 
     @Test
     void testExtractRootSpanStartTime_EmptyInput() {
-        assertNull(StripFunctions.extractRootSpanStartTime(""));
-        assertNull(StripFunctions.extractRootSpanStartTime("   "));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime(""));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime("   "));
     }
 
     @Test
     void testExtractRootSpanStartTime_InvalidJson() {
-        assertNull(StripFunctions.extractRootSpanStartTime("{invalid json}"));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime("{invalid json}"));
     }
 
     @Test
     void testExtractRootSpanStartTime_NoTrace() {
         String json = "{\"notATrace\": {}}";
-        assertNull(StripFunctions.extractRootSpanStartTime(json));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime(json));
     }
 
     @Test
@@ -70,7 +70,7 @@ class StripFunctionsTest {
                   }
                 }
                 """;
-        assertNull(StripFunctions.extractRootSpanStartTime(json));
+        assertNull(LgtmStripFunctions.extractRootSpanStartTime(json));
     }
 
     @Test
@@ -137,7 +137,7 @@ class StripFunctionsTest {
                 }
                 """;
 
-        var stripFn = StripFunctions.METRICS;
+        var stripFn = LgtmStripFunctions.METRICS;
         var result = stripFn.apply(
                 dev.langchain4j.service.tool.ToolExecutionResult.builder()
                         .resultText(metricsJson)

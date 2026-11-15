@@ -26,14 +26,14 @@ The `app.ports` argument is optional -- it tells the AI module which of your app
 
 === LLM Provider Selection
 
-The AI module uses Maven profiles to select the LLM provider:
+The AI module uses property-activated Maven profiles to select the LLM provider and observability platform. Defaults (`llm.provider=openai`, `observability.platform=lgtm`) are set in `.mvn/maven.config`:
 
 [source,bash]
 ----
-./mvn.ai.sh quarkus:dev              # OpenAI (default)
-./mvn.ai.sh quarkus:dev -Pgrok       # Grok/xAI
-./mvn.ai.sh quarkus:dev -Pgemini     # Gemini
-./mvn.ai.sh quarkus:dev -Pwatsonx    # WatsonX
+./mvn.ai.sh quarkus:dev                        # OpenAI + LGTM (defaults)
+./mvn.ai.sh quarkus:dev -Dllm.provider=grok    # Grok/xAI
+./mvn.ai.sh quarkus:dev -Dllm.provider=gemini  # Gemini
+./mvn.ai.sh quarkus:dev -Dllm.provider=watsonx # WatsonX
 ----
 
 === Environment Variables

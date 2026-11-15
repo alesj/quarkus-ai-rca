@@ -26,27 +26,15 @@ Wait for (1) to **fully** start, so (2) and (3) share the **same** LGTM resource
 
 (3) ./mvn.ai.sh quarkus:dev
 
-In (3) you have 3 profiles:
-* default - OpenAI
-* -Pgrok - Grok xAI
-* -Pwatsonx - WatsonX
-* -Pgemini - Gemini
+In (3) you can select the LLM provider via `-Dllm.provider=<name>` (defaults to `openai` via `.mvn/maven.config`):
+* `-Dllm.provider=openai` - OpenAI (default)
+* `-Dllm.provider=grok` - Grok xAI
+* `-Dllm.provider=watsonx` - WatsonX
+* `-Dllm.provider=gemini` - Gemini
 
-This will run Quarkus with same `quarkus.profile` property as Maven profile name,
-and picking up the right Quarkus LangChain4J dependencies.
+Similarly, the observability platform is selected via `-Dobservability.platform=<name>` (defaults to `lgtm`).
 
-```xml
-<!-- Default: OpenAI -->
-<profile>
-    <id>openai</id>
-    <activation>
-        <activeByDefault>true</activeByDefault>
-    </activation>
-    <properties>
-        <quarkus.profile>openai</quarkus.profile>
-    </properties>
-    ...
-```
+Each value activates the corresponding Maven profile, which sets `quarkus.profile` and pulls in the right dependencies.
 
 ---
 
@@ -83,8 +71,8 @@ and picking up the right Quarkus LangChain4J dependencies.
 Set the API key for your chosen LLM provider before starting the AI module:
 
 ```bash
-export OPENAI_API_KEY=sk-...   # for default/openai profile
-export GROK_API_KEY=xai-...    # for -Pgrok profile
+export OPENAI_API_KEY=sk-...   # for default (llm.provider=openai)
+export GROK_API_KEY=xai-...    # for -Dllm.provider=grok
 ```
 
 To enable Dev MCP (source examination, dashboard generation), the companion apps must have `quarkus.dev-mcp.enabled=true` in their `application.properties`, and the AI module needs to know their ports:

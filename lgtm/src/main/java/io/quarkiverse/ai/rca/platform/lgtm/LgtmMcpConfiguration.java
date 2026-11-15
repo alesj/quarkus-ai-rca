@@ -1,4 +1,4 @@
-package io.quarkiverse.ai.rca;
+package io.quarkiverse.ai.rca.platform.lgtm;
 
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 @IfBuildProperty(name = "test.fixture-mcp", stringValue = "false", enableIfMissing = true)
-public class McpClientConfiguration {
-    private static final Logger log = LoggerFactory.getLogger(McpClientConfiguration.class);
+public class LgtmMcpConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(LgtmMcpConfiguration.class);
 
     @ConfigProperty(name = "tempo-mcp.endpoint")
     String tempoMcpEndpoint;
@@ -42,7 +42,7 @@ public class McpClientConfiguration {
                 .clientName("tempo")
                 .transport(transport)
                 .build();
-        return new StripMcpClient(client, StripFunctions.TRACE);
+        return new StripMcpClient(client, LgtmStripFunctions.TRACE);
     }
 
     @Singleton
@@ -63,8 +63,8 @@ public class McpClientConfiguration {
                 .build();
 
         Map<String, Function<ToolExecutionResult, ToolExecutionResult>> toolSpecificFns = Map.of(
-                "query_loki_logs", StripFunctions.LOG_DATA,
-                "query_prometheus", StripFunctions.METRICS);
+                "query_loki_logs", LgtmStripFunctions.LOG_DATA,
+                "query_prometheus", LgtmStripFunctions.METRICS);
 
         return new StripMcpClient(client, Function.identity(), toolSpecificFns);
     }

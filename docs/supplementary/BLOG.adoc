@@ -102,17 +102,17 @@ To run without application ports, simply omit `-Dapp.ports` from the `java` comm
 
 === LLM Provider Selection
 
-AI Root Cause Analysis supports multiple LLM providers via Maven/Quarkus profiles:
+AI Root Cause Analysis supports multiple LLM providers and observability platforms via property-activated Maven profiles. Defaults are set in `.mvn/maven.config` (`llm.provider=openai`, `observability.platform=lgtm`) and can be overridden on the command line:
 
 [source,bash]
 ----
-./mvn.ai.sh quarkus:dev              # OpenAI (default, gpt-4o-mini)
-./mvn.ai.sh quarkus:dev -Pgrok       # Grok/xAI (grok-3-mini)
-./mvn.ai.sh quarkus:dev -Pgemini     # Gemini
-./mvn.ai.sh quarkus:dev -Pwatsonx    # WatsonX (Granite)
+./mvn.ai.sh quarkus:dev                        # OpenAI + LGTM (defaults)
+./mvn.ai.sh quarkus:dev -Dllm.provider=grok    # Grok/xAI (grok-3-mini)
+./mvn.ai.sh quarkus:dev -Dllm.provider=gemini  # Gemini
+./mvn.ai.sh quarkus:dev -Dllm.provider=watsonx # WatsonX (Granite)
 ----
 
-Each profile activates the corresponding LangChain4j extension and Quarkus configuration. Grok uses the OpenAI-compatible API at `https://api.x.ai/v1`.
+Each value activates the corresponding Maven profile, which pulls in the right LangChain4j extension and sets the Quarkus configuration profile. Grok uses the OpenAI-compatible API at `https://api.x.ai/v1`.
 
 == The Web UI
 

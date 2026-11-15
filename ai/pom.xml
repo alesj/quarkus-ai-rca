@@ -27,10 +27,11 @@
     <!-- Dependencies          -->
     <!-- ===================== -->
     <dependencies>
-        <!-- LGTM -->
+        <!-- SPI -->
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+            <groupId>io.quarkiverse.ai.rca</groupId>
+            <artifactId>quarkus-ai-rca-spi</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- LangChain4j MCP (always needed) -->
@@ -130,11 +131,42 @@
     <!-- ===================== -->
     <profiles>
 
-        <!-- Default: OpenAI -->
+        <!-- =============================== -->
+        <!-- Observability platform profiles -->
+        <!-- =============================== -->
+
+        <profile>
+            <id>lgtm</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>lgtm</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.ai.rca</groupId>
+                    <artifactId>quarkus-ai-rca-lgtm</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- =============================== -->
+        <!-- LLM provider profiles           -->
+        <!-- =============================== -->
+
         <profile>
             <id>openai</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>llm.provider</name>
+                    <value>openai</value>
+                </property>
             </activation>
             <properties>
                 <quarkus.profile>openai</quarkus.profile>
@@ -150,6 +182,12 @@
         <!-- Grok (xAI) — reuses OpenAI extension with different base-url -->
         <profile>
             <id>grok</id>
+            <activation>
+                <property>
+                    <name>llm.provider</name>
+                    <value>grok</value>
+                </property>
+            </activation>
             <properties>
                 <quarkus.profile>grok</quarkus.profile>
             </properties>
@@ -164,6 +202,12 @@
         <!-- Gemini -->
         <profile>
             <id>gemini</id>
+            <activation>
+                <property>
+                    <name>llm.provider</name>
+                    <value>gemini</value>
+                </property>
+            </activation>
             <properties>
                 <quarkus.profile>gemini</quarkus.profile>
             </properties>
@@ -192,6 +236,12 @@
         <!-- WatsonX -->
         <profile>
             <id>watsonx</id>
+            <activation>
+                <property>
+                    <name>llm.provider</name>
+                    <value>watsonx</value>
+                </property>
+            </activation>
             <properties>
                 <quarkus.profile>watsonx</quarkus.profile>
             </properties>
