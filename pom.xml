@@ -46,10 +46,10 @@
         <!-- Quarkus -->
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.40.1.2</quarkus.platform.version>
+        <quarkus.platform.version>4.0.0.CR1</quarkus.platform.version>
 
         <!-- LangChain4j directly, when needed -->
-        <quarkus.langchain4j.version>1.14.2</quarkus.langchain4j.version>
+        <quarkus.langchain4j.version>2.0.0.Beta4</quarkus.langchain4j.version>
 
         <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,14 +1,14 @@
 package io.quarkiverse.ai.rca.platform.lgtm;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import dev.langchain4j.service.tool.ToolExecutionResult;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -55,21 +55,18 @@ public class LgtmStripFunctions {
     private static void removeUselessFields(JsonNode node, Set<String> uselessFields) {
         if (node.isObject()) {
             ObjectNode obj = (ObjectNode) node;
-            Iterator<String> fieldNames = obj.fieldNames();
-
-            while (fieldNames.hasNext()) {
-                String fieldName = fieldNames.next();
+            for (String fieldName : new ArrayList<>(obj.propertyNames())) {
                 JsonNode fieldValue = obj.get(fieldName);
 
                 if (uselessFields.contains(fieldName)) {
-                    fieldNames.remove();
+                    obj.remove(fieldName);
                     continue;
                 }
 
                 if (LOCALHOST_FIELDS.contains(fieldName) &&
                         fieldValue.isTextual() &&
                         (fieldValue.asText().equals("127.0.0.1") || fieldValue.asText().equals("localhost"))) {
-                    fieldNames.remove();
+                    obj.remove(fieldName);
                     continue;
                 }
 

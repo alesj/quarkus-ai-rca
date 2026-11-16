@@ -87,8 +87,7 @@ class DbIntegrationTest extends AppsTestBase {
     @Order(3)
     void analyzePoolExhaustion() throws Exception {
         ToxiproxySetup.addLatency(4000);
-        try {
-            ExecutorService executor = Executors.newFixedThreadPool(6);
+        try (ExecutorService executor = Executors.newFixedThreadPool(6)) {
             List<Future<?>> futures = new ArrayList<>();
             String[] params = { "surname", "name", "surname", "age", "name", "surname" };
             String[] values = { "Johnson", "Alice", "Smith", "28", "Bob", "Davis" };

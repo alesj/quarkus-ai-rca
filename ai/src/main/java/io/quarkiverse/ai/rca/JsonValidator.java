@@ -1,7 +1,7 @@
 package io.quarkiverse.ai.rca;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.invocation.InvocationContext;
 import io.quarkiverse.langchain4j.guardrails.ToolInputGuardrail;
@@ -34,7 +34,7 @@ public class JsonValidator implements ToolInputGuardrail {
                     raw = mapper.readValue(raw, String.class);
                 }
 
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 return ToolInputGuardrailResult.failure("Invalid JSON");
             }
         }
