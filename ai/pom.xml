@@ -66,6 +66,18 @@
             <artifactId>quarkus-langchain4j-testing-evaluation-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-junit</artifactId>
+            <version>${quarkus.resiliency-testing.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.resiliencytesting</groupId>
+            <artifactId>quarkus-resiliency-testing-langchain4j</artifactId>
+            <version>${quarkus.resiliency-testing.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

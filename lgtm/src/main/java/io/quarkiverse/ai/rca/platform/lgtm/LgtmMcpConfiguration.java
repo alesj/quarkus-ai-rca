@@ -6,10 +6,10 @@ import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.stdio.StdioMcpTransport;
 import dev.langchain4j.service.tool.ToolExecutionResult;
 import io.quarkiverse.langchain4j.mcp.runtime.http.QuarkusStreamableHttpMcpTransport;
+import io.quarkiverse.langchain4j.mcp.runtime.McpClientName;
 import io.quarkus.arc.properties.IfBuildProperty;
 import io.vertx.core.Vertx;
 import jakarta.enterprise.inject.Disposes;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class LgtmMcpConfiguration {
     String grafanaEndpoint;
 
     @Singleton
-    @Named("tempoMcpClient")
+    @McpClientName("tempo")
     public McpClient tempoMcpClient(Vertx vertx) {
         McpTransport transport = new QuarkusStreamableHttpMcpTransport.Builder()
                 .mcpClientName("tempo")
@@ -46,7 +46,7 @@ public class LgtmMcpConfiguration {
     }
 
     @Singleton
-    @Named("grafanaMcpClient")
+    @McpClientName("grafana")
     public McpClient grafanaMcpClient() {
         McpTransport transport = new StdioMcpTransport.Builder()
                 .command(List.of("uvx", "mcp-grafana"))

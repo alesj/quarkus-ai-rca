@@ -5,9 +5,9 @@ import tools.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.mcp.client.McpClient;
 import io.quarkiverse.ai.rca.ObservabilityPlatform;
+import io.quarkiverse.langchain4j.mcp.runtime.McpClientName;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,11 +24,11 @@ public class LgtmPlatform implements ObservabilityPlatform {
     ObjectMapper mapper;
 
     @Inject
-    @Named("tempoMcpClient")
+    @McpClientName("tempo")
     McpClient tempoMcpClient;
 
     @Inject
-    @Named("grafanaMcpClient")
+    @McpClientName("grafana")
     McpClient grafanaMcpClient;
 
     private final Map<String, String> traceIdToStartTime = new ConcurrentHashMap<>();

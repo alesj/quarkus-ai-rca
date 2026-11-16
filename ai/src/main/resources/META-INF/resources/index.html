@@ -503,7 +503,10 @@
 
                 showPerf(data.perf);
 
-                if (data.analysis) {
+                if (data.error) {
+                    errorMsg.textContent = data.error;
+                    errorMsg.classList.add('visible');
+                } else if (data.analysis) {
                     rawAnalysis = data.analysis;
                     renderContent(sections.analysis.body, data.analysis, outputType);
                     sections.analysis.el.classList.add('visible');

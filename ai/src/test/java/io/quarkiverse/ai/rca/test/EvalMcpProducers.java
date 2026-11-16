@@ -1,9 +1,9 @@
 package io.quarkiverse.ai.rca.test;
 
 import dev.langchain4j.mcp.client.McpClient;
+import io.quarkiverse.langchain4j.mcp.runtime.McpClientName;
 import io.quarkus.arc.properties.IfBuildProperty;
 import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class EvalMcpProducers {
 
     @Produces
     @Singleton
-    @Named("tempoMcpClient")
+    @McpClientName("tempo")
     McpClient tempoMcpClient() {
         return new FixtureMcpClient("tempo", Map.of(
                 "traceql-search", loadFixture("evaluation/mcp/traceql-search.json"),
@@ -25,7 +25,7 @@ public class EvalMcpProducers {
 
     @Produces
     @Singleton
-    @Named("grafanaMcpClient")
+    @McpClientName("grafana")
     McpClient grafanaMcpClient() {
         return new FixtureMcpClient("grafana", Map.of(
                 "query_loki_logs", loadFixture("evaluation/mcp/query_loki_logs.json"),

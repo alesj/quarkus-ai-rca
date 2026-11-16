@@ -78,7 +78,14 @@ public class InputResource {
         metrics.reset();
         long startTime = System.nanoTime();
 
-        String analysis = telemetry.analyze(n, outputType);
+        String analysis;
+        try {
+            analysis = telemetry.analyze(n, outputType);
+        } catch (Exception e) {
+            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+            log.error("Analysis failed after {}ms", durationMs, e);
+            return AnalysisResult.error("Analysis failed: " + e.getMessage(), durationMs);
+        }
 
         long durationMs = (System.nanoTime() - startTime) / 1_000_000;
 
