@@ -31,6 +31,12 @@ public class CompanionApps {
                 "-Dquarkus.http.port=" + port,
                 "-Dquarkus.console.enabled=false",
                 "-Dquarkus.test.continuous-testing=disabled"));
+
+        String platform = System.getProperty("observability.platform");
+        if (platform != null) {
+            command.add("-Dobservability.platform=" + platform);
+        }
+
         for (String prop : extraProps) {
             command.add("-D" + prop);
         }

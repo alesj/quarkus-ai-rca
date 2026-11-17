@@ -17,18 +17,13 @@
 
     <dependencies>
 
-        <!-- SPI -->
+        <!-- Common (SPI + utilities) -->
         <dependency>
             <groupId>io.quarkiverse.ai.rca</groupId>
-            <artifactId>quarkus-ai-rca-spi</artifactId>
+            <artifactId>quarkus-ai-rca-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- LangChain4j MCP -->
-        <dependency>
-            <groupId>io.quarkiverse.langchain4j</groupId>
-            <artifactId>quarkus-langchain4j-mcp</artifactId>
-        </dependency>
 
     </dependencies>
 

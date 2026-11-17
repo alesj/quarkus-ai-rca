@@ -160,9 +160,9 @@ AI Root Cause Analysis is a https://github.com/quarkiverse/quarkus-ai-rca[Quarki
 * *Anthropic provider* integration
 * *Native image* compilation support
 * *Additional LLM providers* (Gemini and WatsonX integration testing)
-* *Additional observability backends* — currently the project connects to Grafana LGTM via MCP, but the analysis pipeline, system prompt, and evaluation framework are backend-agnostic. Supporting platforms like Datadog, Elastic, or New Relic is primarily a matter of introducing new MCP tool providers for their APIs; the core analysis logic and test harness stay the same
+* *Additional observability backends* — the project now supports both Grafana LGTM and Elastic via a pluggable `ObservabilityPlatform` SPI. The analysis pipeline, system prompt, and evaluation framework are backend-agnostic. Supporting additional platforms like Datadog or New Relic is a matter of implementing the SPI and introducing new MCP tool providers for their APIs
 * *Community feedback* on analysis quality and usefulness across different application architectures
 
-Try it out: grab the uber-jar from Maven Central (or clone the repo for dev mode), set an API key, point it at your LGTM stack, and see what the AI finds.
+Try it out: grab the uber-jar from Maven Central (or clone the repo for dev mode), set an API key, point it at your observability stack (LGTM or Elastic), and see what the AI finds.
 
 For a deep dive into the architecture, analysis pipeline, and how we test this with chaos engineering and LLM-as-judge evaluation, see the link:BLOG-DEEP-DIVE.adoc[companion post].

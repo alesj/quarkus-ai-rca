@@ -9,10 +9,20 @@
         <version>0.1.5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>quarkus-ai-rca-spi</artifactId>
+    <artifactId>quarkus-ai-rca-common</artifactId>
     <packaging>jar</packaging>
 
-    <name>Quarkus AI RCA SPI</name>
-    <description>Observability platform SPI for pluggable backends</description>
+    <name>Quarkus AI RCA Common</name>
+    <description>Observability platform SPI and shared utilities</description>
+
+    <dependencies>
+
+        <!-- LangChain4j MCP (for StripMcpClient) -->
+        <dependency>
+            <groupId>io.quarkiverse.langchain4j</groupId>
+            <artifactId>quarkus-langchain4j-mcp</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>

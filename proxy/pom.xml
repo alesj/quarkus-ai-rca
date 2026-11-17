@@ -48,12 +48,6 @@
             <artifactId>quarkus-micrometer-opentelemetry</artifactId>
         </dependency>
 
-        <!-- LGTM -->
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-observability-devservices-lgtm</artifactId>
-        </dependency>
-
         <!-- Tests -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -90,6 +84,43 @@
 
         </plugins>
     </build>
+
+    <!-- ===================== -->
+    <!-- Profiles              -->
+    <!-- ===================== -->
+    <profiles>
+        <profile>
+            <id>lgtm</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>lgtm</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>elastic</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>elastic</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-elastic</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
 

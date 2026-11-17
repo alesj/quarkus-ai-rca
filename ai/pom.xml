@@ -27,10 +27,10 @@
     <!-- Dependencies          -->
     <!-- ===================== -->
     <dependencies>
-        <!-- SPI -->
+        <!-- Common (SPI + utilities) -->
         <dependency>
             <groupId>io.quarkiverse.ai.rca</groupId>
-            <artifactId>quarkus-ai-rca-spi</artifactId>
+            <artifactId>quarkus-ai-rca-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -164,6 +164,28 @@
                 <dependency>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>elastic</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>elastic</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.ai.rca</groupId>
+                    <artifactId>quarkus-ai-rca-elastic</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-elastic</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
                 </dependency>
             </dependencies>
         </profile>

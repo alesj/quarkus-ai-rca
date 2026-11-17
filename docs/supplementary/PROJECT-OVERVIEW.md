@@ -2,7 +2,7 @@
 
 ## What It Is
 
-AI Root Cause Analysis is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
+AI Root Cause Analysis is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to pluggable observability platforms (Grafana LGTM, Elastic) via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
 
 ## Architecture
 
@@ -21,14 +21,16 @@ User (browser / curl)
        |                     |                     |
        v                     v                     v
   +----------+         +----------------------------------+
-  | LLM      |         |  LGTM Stack (shared container)   |
-  | (OpenAI, |         |  Tempo | Loki | Prometheus       |
-  |  Grok,   |         +----------------------------------+
-  |  Gemini, |               ^         ^         ^
-  |  WatsonX)|               |         |         |
-  +----------+          Tempo MCP   Grafana MCP (Loki+Prom)
-                             |         |
-                        MCP clients in AI module
+  | LLM      |         |  Observability Stack             |
+  | (OpenAI, |         |  LGTM: Tempo | Loki | Prometheus |
+  |  Grok,   |         |  -or-                            |
+  |  Gemini, |         |  Elastic: ES | Kibana | APM      |
+  |  WatsonX)|         +----------------------------------+
+  +----------+               ^              ^
+                              |              |
+                     MCP clients in AI module
+                     (LGTM: Tempo + Grafana MCP)
+                     (Elastic: Kibana Agent Builder MCP)
 ```
 
 **Modules:**
@@ -84,10 +86,11 @@ User (browser / curl)
 - DB chaos testing via Toxiproxy (latency injection, connection cuts) with JDBC telemetry for query-level span visibility
 
 ### Telemetry Data Pipeline
-- Tempo MCP for trace retrieval (TraceQL with `nestedSetParent = -1` for unique trace IDs)
-- Grafana MCP (stdio, `uvx mcp-grafana`) for Loki logs and Prometheus metrics
+- Pluggable `ObservabilityPlatform` SPI with LGTM and Elastic implementations
+- **LGTM:** Tempo MCP for trace retrieval (TraceQL), Grafana MCP (stdio, `uvx mcp-grafana`) for Loki logs and Prometheus metrics
+- **Elastic:** Kibana Agent Builder MCP for traces, logs, and metrics via ES|QL queries
 - Aggressive metrics filtering (94% reduction: 586 -> ~35 entries) to stay within LLM context limits
-- Trace/log data stripping to remove SDK noise
+- `StripMcpClient` decorator for MCP response noise removal (SDK telemetry fields, internal metadata)
 
 ## MVP Requirements and Milestones
 

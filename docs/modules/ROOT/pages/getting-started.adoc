@@ -5,7 +5,7 @@
 * JDK 21+
 * Maven 3.9+ (or use the included `mvnw` wrapper)
 * Docker (for LGTM stack via Dev Services)
-* https://docs.astral.sh/uv/[uvx] -- used to run the `mcp-grafana` MCP server (`pip install uv` or `brew install uv`)
+* https://docs.astral.sh/uv/[uvx] -- used to run the `mcp-grafana` MCP server for LGTM (`pip install uv` or `brew install uv`); not needed for Elastic
 * API key for at least one LLM provider (OpenAI or Grok)
 
 == Quick Start
@@ -35,6 +35,16 @@ The AI module uses property-activated Maven profiles to select the LLM provider 
 ./mvn.ai.sh quarkus:dev -Dllm.provider=gemini  # Gemini
 ./mvn.ai.sh quarkus:dev -Dllm.provider=watsonx # WatsonX
 ----
+
+=== Observability Platform Selection
+
+[source,bash]
+----
+./mvn.ai.sh quarkus:dev -Dobservability.platform=lgtm     # Grafana LGTM (default)
+./mvn.ai.sh quarkus:dev -Dobservability.platform=elastic   # Elastic (ES + Kibana + APM)
+----
+
+Both can be combined: `-Dllm.provider=grok -Dobservability.platform=elastic`.
 
 === Environment Variables
 
@@ -108,6 +118,25 @@ Then run the AI module with the `lgtm` profile:
 [source,bash]
 ----
 ./mvn.ai.sh quarkus:dev -Dquarkus.profile=lgtm,openai
+----
+
+== Manual Elastic (without DevServices)
+
+To connect to an externally started Elastic stack:
+
+[source,bash]
+----
+./mvn.ai.sh quarkus:dev -Dobservability.platform=elastic -Dquarkus.profile=elastic,openai
+----
+
+Key properties for manual connection:
+
+[source,properties]
+----
+%elastic.quarkus.observability.enabled=false
+%elastic.elasticsearch.endpoint=http://localhost:9200
+%elastic.kibana.endpoint=http://localhost:5601
+%elastic.apm-server.url=localhost:8200
 ----
 
 == Trying It with Example Apps

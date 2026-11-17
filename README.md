@@ -3,15 +3,15 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.ai.rca/quarkus-ai-rca-core.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.ai.rca/quarkus-ai-rca-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-LLM-powered Root Cause Analysis of distributed systems using Quarkus, LangChain4j, and Grafana LGTM via MCP.
+LLM-powered Root Cause Analysis of distributed systems using Quarkus, LangChain4j, and pluggable observability platforms (Grafana LGTM, Elastic) via MCP.
 
 For detailed documentation, see the [docs](docs/modules/ROOT/pages/index.adoc).
 
 ## Requirements
 
 * **Java 21+** and **Maven 3.9+** (or use the included `./mvnw` wrapper)
-* **Docker** or **Podman** — Quarkus Dev Services automatically starts LGTM (Grafana, Tempo, Loki, Prometheus), MySQL, and Toxiproxy containers
-* **[uvx](https://docs.astral.sh/uv/)** — used to run the `mcp-grafana` MCP server (`pip install uv` or `brew install uv`)
+* **Docker** or **Podman** — Quarkus Dev Services automatically starts the observability stack (LGTM or Elastic), MySQL, and Toxiproxy containers
+* **[uvx](https://docs.astral.sh/uv/)** — used to run the `mcp-grafana` MCP server for LGTM (`pip install uv` or `brew install uv`); not needed for Elastic
 * **LLM API key** — at least one of: `OPENAI_API_KEY`, `GROK_API_KEY`, `GEMINI_API_KEY`, or `WATSONX_API_KEY`
 
 ## How to run / test the AI part
@@ -32,7 +32,9 @@ In (3) you can select the LLM provider via `-Dllm.provider=<name>` (defaults to 
 * `-Dllm.provider=watsonx` - WatsonX
 * `-Dllm.provider=gemini` - Gemini
 
-Similarly, the observability platform is selected via `-Dobservability.platform=<name>` (defaults to `lgtm`).
+Similarly, the observability platform is selected via `-Dobservability.platform=<name>` (defaults to `lgtm`):
+* `-Dobservability.platform=lgtm` - Grafana LGTM (default) — Tempo + Grafana MCP
+* `-Dobservability.platform=elastic` - Elastic — Kibana Agent Builder MCP
 
 Each value activates the corresponding Maven profile, which sets `quarkus.profile` and pulls in the right dependencies.
 
