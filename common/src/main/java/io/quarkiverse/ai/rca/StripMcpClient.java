@@ -1,4 +1,4 @@
-package io.quarkiverse.ai.rca.platform.lgtm;
+package io.quarkiverse.ai.rca;
 
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;

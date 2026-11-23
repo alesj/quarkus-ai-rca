@@ -1,0 +1,28 @@
+PLATFORM-SPECIFIC: Grafana LGTM (Loki, Grafana, Tempo, Mimir/Prometheus)
+=========================================================================
+
+MCP TOOL RESTRICTION:
+DO NOT call MCP tools directly (traceql-search, get-trace, query_loki_logs, query_prometheus).
+Use only the high-level tools listed in the base instructions.
+
+DURATION FIELD:
+Trace data comes from Tempo in OpenTelemetry format. Span durations are in the durationNanos field
+(nanoseconds). Convert to milliseconds by dividing by 1,000,000 before comparing to thresholds.
+Example: durationNanos = 3250000000 → 3250 ms → 3.25 seconds → significant latency.
+
+TRACE DATA FORMAT:
+Traces are returned as OTel JSON with resourceSpans → scopeSpans → spans hierarchy.
+Key span attributes: http.method, http.route, http.status_code, http.target, net.peer.name.
+Span fields: traceId, spanId, parentSpanId, name, kind, startTimeUnixNano, endTimeUnixNano,
+durationNanos, status (code, message), attributes (key-value pairs).
+The root span has no parentSpanId (or parentSpanId = "0000000000000000").
+
+LOG FORMAT:
+Logs come from Loki via LogQL queries, filtered by trace_id.
+Log entries include timestamp, severity, service_name, and message body.
+
+METRIC FORMAT:
+Metrics come from Prometheus instant queries. Standard metric names:
+jvm_memory_used_bytes, jvm_gc_overhead, system_cpu_usage, process_cpu_usage,
+http_server_active_requests, worker_pool_idle, worker_pool_queue_size,
+http_client_active_connections, http_client_queue_size.

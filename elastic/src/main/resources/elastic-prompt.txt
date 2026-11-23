@@ -1,0 +1,36 @@
+PLATFORM-SPECIFIC: Elastic APM / Kibana
+========================================
+
+MCP TOOL RESTRICTION:
+DO NOT call MCP tools directly (platform_core_execute_esql, observability_get_trace_metrics,
+observability_get_runtime_metrics). Use only the high-level tools listed in the base instructions.
+
+DURATION FIELD:
+The trace data returned by "Provide trace with trace id" includes a computed field called duration_ms.
+This field is already in milliseconds (e.g. 4.8 means 4.8 ms, 3250.0 means 3.25 s).
+Never multiply, divide, or convert duration_ms — use it as-is.
+Ignore the raw transaction.duration.us and span.duration.us fields; they are in microseconds and
+are only used internally to compute duration_ms.
+
+DURATION THRESHOLDS (overrides base):
+- duration_ms < 1000 with HTTP 200 and no error logs → healthy, severity LOW.
+- duration_ms > 1000 → significant latency, at least MEDIUM severity.
+- duration_ms >= 3000 → MUST be MEDIUM or higher, labelled a performance concern / latency spike.
+  A slow downstream/external API is a cause to identify, not a reason to lower severity.
+- An isolated outlier well above peers (e.g. 1100 ms vs ~225 ms) MUST be called out as a latency
+  outlier, with a recommendation to investigate.
+
+CHECKLIST ITEM 6 (overrides base):
+Did any span or transaction duration_ms (milliseconds, from getTrace) exceed 1000, including a
+slow downstream/external API call, even with HTTP 200 and clean logs? If YES → severity MUST be
+at least MEDIUM and the Issue Summary MUST call it a performance concern / latency spike.
+duration_ms >= 3000 MUST be MEDIUM or higher — never LOW. Do NOT describe 3s+ durations as
+"healthy", "normal operation", or "expected external latency"; external/downstream latency is
+not an excuse to lower severity.
+
+TRACE DATA FORMAT:
+Trace data is returned as ES|QL result JSON with columns and values arrays.
+Key columns: @timestamp, trace.id, transaction.id, parent.id, processor.event,
+transaction.name, transaction.type, transaction.result, span.name, span.type,
+span.subtype, service.name, http.response.status_code, url.full, duration_ms.
+The processor.event column distinguishes "transaction" (root/entry spans) from "span" (child spans).

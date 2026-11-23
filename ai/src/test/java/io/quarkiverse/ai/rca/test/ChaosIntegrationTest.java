@@ -48,7 +48,7 @@ class ChaosIntegrationTest extends AppsTestBase {
         String criteria = """
                 All requests completed successfully with HTTP 200/204 status codes.
                 No errors, no latency spikes, no resource issues.
-                Analysis should report healthy system state with normal operation.""";
+                Analysis should report healthy system state with normal operation.""" + HealthyBaseline.RUBRIC;
 
         waitAndAnalyze("NORMAL TRAFFIC", 2, criteria);
     }

@@ -34,26 +34,68 @@ public class LgtmPlatform implements ObservabilityPlatform {
     private final Map<String, String> traceIdToStartTime = new ConcurrentHashMap<>();
 
     @Override
+    public String platformName() {
+        return "lgtm";
+    }
+
+    private static final Duration[] SEARCH_WINDOWS = {
+            Duration.ofMinutes(5), Duration.ofMinutes(15),
+            Duration.ofHours(1), Duration.ofHours(6), Duration.ofHours(24)
+    };
+
+    @Override
     public List<String> searchTraces(int count) {
+        Instant now = Instant.now();
+        List<String> best = List.of();
+        for (Duration window : SEARCH_WINDOWS) {
+            List<String> traceIds = searchTraces(count, now.minus(window), now);
+            if (traceIds.size() >= count) {
+                return traceIds;
+            }
+            if (traceIds.size() > best.size()) {
+                best = traceIds;
+            }
+        }
+        return best;
+    }
+
+    private List<String> searchTraces(int count, Instant start, Instant end) {
+        String args = String.format(
+                "{\"query\":\"{ nestedSetParent = -1 } with (most_recent=true)\"," +
+                        "\"start\":\"%s\",\"end\":\"%s\"}",
+                toPrometheusTime(start), toPrometheusTime(end));
         ToolExecutionRequest request = ToolExecutionRequest.builder()
                 .name("traceql-search")
-                .arguments("{\"query\":\"{ nestedSetParent = -1 }\",\"limit\":" + count + "}")
+                .arguments(args)
                 .build();
         String result = tempoMcpClient.executeTool(request).resultText();
 
         try {
             JsonNode root = mapper.readTree(result);
             JsonNode traces = root.path("traces");
-            List<String> traceIds = new ArrayList<>();
+            List<JsonNode> traceNodes = new ArrayList<>();
 
             if (traces.isArray()) {
                 for (JsonNode trace : traces) {
-                    String traceId = trace.path("traceID").asText();
-                    if (!traceId.isEmpty() && !traceIds.contains(traceId)) {
-                        traceIds.add(traceId);
-                        if (traceIds.size() >= count) {
-                            break;
-                        }
+                    if (!trace.path("traceID").asText().isEmpty()) {
+                        traceNodes.add(trace);
+                    }
+                }
+            }
+
+            traceNodes.sort((a, b) -> {
+                long tsA = a.path("startTimeUnixNano").asLong(0);
+                long tsB = b.path("startTimeUnixNano").asLong(0);
+                return Long.compare(tsB, tsA);
+            });
+
+            List<String> traceIds = new ArrayList<>();
+            for (JsonNode trace : traceNodes) {
+                String traceId = trace.path("traceID").asText();
+                if (!traceIds.contains(traceId)) {
+                    traceIds.add(traceId);
+                    if (traceIds.size() >= count) {
+                        break;
                     }
                 }
             }

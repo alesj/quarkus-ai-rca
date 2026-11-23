@@ -1,6 +1,5 @@
-package io.quarkiverse.ai.rca.test;
+package io.quarkiverse.ai.rca.platform.lgtm;
 
-import io.quarkiverse.ai.rca.platform.lgtm.LgtmStripFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -13,21 +12,15 @@ class StripFunctionsTest {
 
     @Test
     void testExtractRootSpanStartTime() throws IOException {
-        // Load traces.json from test resources
         String traceJson;
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("traces.json")) {
             assertNotNull(is, "traces.json should exist in test resources");
             traceJson = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
 
-        // Extract root span start time
         String startTime = LgtmStripFunctions.extractRootSpanStartTime(traceJson);
 
-        // Verify result
         assertNotNull(startTime, "Root span start time should not be null");
-
-        // Expected: 1778598649074740000 nanoseconds
-        // The timestamp is in UTC (Z suffix)
         assertEquals("2026-05-12T15:10:49.074740Z", startTime);
     }
 
@@ -145,14 +138,12 @@ class StripFunctionsTest {
 
         String stripped = result.resultText();
 
-        // Should keep useful metrics
         assertTrue(stripped.contains("jvm_memory_used_bytes"), "Should keep jvm_memory_used_bytes");
         assertTrue(stripped.contains("system_cpu_usage"), "Should keep system_cpu_usage");
         assertTrue(stripped.contains("poke_value"), "Should keep poke_value");
         assertTrue(stripped.contains("http_server_requests_max_milliseconds"),
                 "Should keep http_server_requests_max_milliseconds");
 
-        // Should remove useless metrics
         assertFalse(stripped.contains("netty_allocator_pooled_arenas"), "Should remove netty_allocator_pooled_arenas");
         assertFalse(stripped.contains("jvm_info_total"), "Should remove jvm_info_total");
         assertFalse(stripped.contains("otel_sdk_processor_log_queue_size"), "Should remove otel_sdk_* metrics");

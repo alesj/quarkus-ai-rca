@@ -24,13 +24,22 @@ Examples:
 ./run-integration-test.sh weather openai grok      # weather, AI=openai, scorer=grok
 ----
 
-=== All Provider Combinations
+=== All Test Types
+
+Run all test types (chaos, db, weather) for a given platform and AI combo:
 
 [source,bash]
 ----
-./run-all-integration-tests.sh chaos    # all 4 combos for chaos
-./run-all-integration-tests.sh db       # all 4 combos for db
-./run-all-integration-tests.sh weather  # all 4 combos for weather
+./run-all-integration-tests.sh <platform> <ai> <scorer>
+----
+
+Examples:
+
+[source,bash]
+----
+./run-all-integration-tests.sh elastic openai grok   # Elastic, AI=openai, scorer=grok
+./run-all-integration-tests.sh elastic grok openai   # Elastic, AI=grok, scorer=openai
+./run-all-integration-tests.sh lgtm openai grok      # LGTM, AI=openai, scorer=grok
 ----
 
 === Specific Test Methods
@@ -147,9 +156,9 @@ The analyzer LLM and scorer LLM can be different providers, preventing self-eval
 
 [source,bash]
 ----
-./run-integration-test.sh chaos openai grok     # AI=OpenAI, scorer=Grok
-./run-integration-test.sh chaos grok openai     # AI=Grok, scorer=OpenAI
-./run-all-integration-tests.sh chaos            # all 4 combinations
+./run-integration-test.sh chaos openai grok          # AI=OpenAI, scorer=Grok
+./run-integration-test.sh chaos grok openai          # AI=Grok, scorer=OpenAI
+./run-all-integration-tests.sh elastic openai grok   # all test types on Elastic
 ----
 
 == Environment Variables

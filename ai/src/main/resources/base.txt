@@ -12,7 +12,7 @@ AVAILABLE TOOLS (use ONLY these exact tool names):
 - "Get root span start time for trace id"
 - "Get all Prometheus metrics at specific time"
 
-DO NOT use any other tools. DO NOT call MCP tools directly (traceql-search, get-trace, query_loki_logs, query_prometheus).
+DO NOT use any other tools. DO NOT call MCP tools directly — use only the tools listed above.
 
 MANDATORY STEPS - Execute in this EXACT order:
 
@@ -91,6 +91,16 @@ MANDATORY STEPS - Execute in this EXACT order:
       If ANY keyword is found, that trace is a CHAOS TRACE — apply ALL rules below to it regardless of
       what other traces in the batch look like.
 
+      IMPORTANT: If a trace's logs contain connection errors (Connection refused, ConnectException,
+      NoRouteToHost, HttpClosedException, connection timeout) but NO chaos keywords listed above,
+      this is an INFRASTRUCTURE FAILURE, not chaos injection. Identify the specific failing
+      component — if spans reference database/mysql/jdbc/datasource operations, report it as
+      DATABASE UNAVAILABILITY; if spans reference downstream HTTP services, report it as a
+      network partition or service outage. Always:
+      - Name the specific component that failed (e.g., "MySQL database", "downstream service")
+      - Look for patterns: successful requests before, failures during, recovery after
+      - Recommend circuit breakers, health checks, retry policies, and connection pool resilience
+
       For every chaos trace:
       - Report it as intentional resource pressure. Quantify impact from logs (heap MB, delay ms, threads blocked).
       - Flag as ROOT CAUSE even if worker_pool_idle>0 or jvm_gc_overhead=0 in metrics — state "Metrics
@@ -155,8 +165,8 @@ MANDATORY STEPS - Execute in this EXACT order:
       Recommend monitoring and alerting on 5xx rates even when the errors are expected.
 
    G. CRITICAL THRESHOLDS TO FLAG:
-      - Span duration <1s with HTTP 200 and no error logs → healthy normal operation, severity LOW. Do NOT flag latency under 1s as a performance concern when worker_pool_idle>0 and jvm_gc_overhead is near 0%. Variation between traces (e.g., 70ms vs 260ms) is normal and does NOT indicate resource contention.
-      - Span duration >1s → significant latency, ALWAYS flag as a performance concern in Issue Summary and Severity (at least MEDIUM). This applies even when HTTP status is 200 and no errors are present — high latency alone is a degradation. Identify the cause: Thread.sleep, blocked I/O, slow downstream/external API, GC pause, or resource contention. Correlate with logs (look for sleep/delay/timeout messages) and metrics. When logs show chaos-type messages (e.g., "Chaos threadpool", "GC churn", "CPU burn"), explicitly tie the span duration to that chaos operation as the root cause.
+      - Span duration <1s with HTTP 200 and no error logs → healthy normal operation, severity LOW. Do NOT flag latency under 1s as a performance concern when worker_pool_idle>0 and jvm_gc_overhead is near 0%. Variation between traces both under 1s (e.g., 70ms vs 260ms) is normal and does NOT indicate resource contention.
+      - Span duration >1s → significant latency, ALWAYS flag as a performance concern in Issue Summary and Severity (at least MEDIUM). This applies even when HTTP status is 200 and no errors are present — high latency alone is a degradation. Span duration >= 3s MUST be MEDIUM or higher and labelled a performance concern / latency spike in the Issue Summary. A slow downstream/external API is a cause to identify, not a reason to lower severity or call the latency "expected". An isolated outlier well above peers (e.g. 1100 ms vs ~225 ms) MUST be called out as a latency outlier, with a recommendation to investigate. Identify the cause: Thread.sleep, blocked I/O, slow downstream/external API, GC pause, or resource contention. Correlate with logs (look for sleep/delay/timeout messages) and metrics. When logs show chaos-type messages (e.g., "Chaos threadpool", "GC churn", "CPU burn"), explicitly tie the span duration to that chaos operation as the root cause.
       - jvm_memory_used_bytes >90% of max → memory pressure, likely GC thrashing
       - system_cpu_usage or process_cpu_usage >80% → CPU saturation
       - worker_pool_queue_size >0 AND worker_pool_idle=0 → thread starvation
@@ -275,8 +285,16 @@ FINAL CHECKLIST (MANDATORY — verify before outputting):
       in metrics (metrics may have missed the pressure window).
    5. Did logs say "lock contention" or "BLOCKED waiting"? If YES → flag lock contention as ROOT CAUSE,
       report the number of threads competing and their wait times.
-   6. Did any span take >1s? If YES → identify the cause (Thread.sleep, chaos delay, lock contention,
-      resource contention) and flag as a latency spike.
+   6. Did any span or transaction duration exceed 1 second, including a slow downstream/external API
+      call, even with HTTP 200 and clean logs? If YES → severity MUST be at least MEDIUM and the
+      Issue Summary MUST call it a performance concern / latency spike. Duration >= 3s MUST be
+      MEDIUM or higher — never LOW. Do NOT describe 3s+ durations as "healthy", "normal operation",
+      or "expected external latency"; external/downstream latency is not an excuse to lower severity.
+      An isolated outlier well above peers (e.g. 1100 ms vs ~225 ms) MUST be called out as a latency
+      outlier, with a recommendation to investigate.
+   7. Did logs say "DEADLOCK DETECTED" or "permanently blocked"? If YES → severity MUST be at least
+      HIGH (not just MEDIUM). Deadlocks permanently block threads and are more severe than contention.
+      Explicitly state that two threads are waiting for each other's locks, causing mutual blocking.
 
 VALIDATION: Before providing analysis, verify you made these TOOL CALLS:
 - "Provide trace with trace id": called ONCE per trace ID

@@ -44,12 +44,6 @@
             <artifactId>quarkus-micrometer-opentelemetry</artifactId>
         </dependency>
 
-        <!-- LGTM -->
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-observability-devservices-lgtm</artifactId>
-        </dependency>
-
         <!-- Tests -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -86,6 +80,74 @@
 
         </plugins>
     </build>
+
+    <!-- ===================== -->
+    <!-- Profiles              -->
+    <!-- ===================== -->
+    <profiles>
+        <profile>
+            <id>lgtm</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>lgtm</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>elastic</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>elastic</value>
+                </property>
+            </activation>
+            <!-- TODO [elastic-release] Remove properties block when Elastic Dev Services ship in a Quarkus release -->
+            <properties>
+                <quarkus.bootstrap.incompatible-extensions>warn</quarkus.bootstrap.incompatible-extensions>
+                <quarkus.observability.lgtm.enabled>false</quarkus.observability.lgtm.enabled>
+            </properties>
+            <dependencies>
+                <!-- TODO [elastic-release] Remove explicit versions; they will come from the Quarkus BOM -->
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-elastic</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-testcontainers</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devresource-testcontainers</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-common</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devresource-common</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
 

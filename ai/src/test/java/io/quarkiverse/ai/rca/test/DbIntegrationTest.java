@@ -55,8 +55,8 @@ class DbIntegrationTest extends AppsTestBase {
         String criteria = """
                 All requests completed successfully with HTTP 200 status codes.
                 The requests are database queries for persons by surname and name.
-                No errors, no latency spikes, no resource issues.
-                Analysis should report healthy system state with normal operation.""";
+                No errors, no latency spikes, no resource issues. Local DB queries take a few milliseconds.
+                Analysis should report healthy system state with normal operation.""" + HealthyBaseline.RUBRIC;
 
         waitAndAnalyze("DB NORMAL TRAFFIC", 2, criteria);
     }

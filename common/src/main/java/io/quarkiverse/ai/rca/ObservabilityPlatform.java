@@ -1,5 +1,8 @@
 package io.quarkiverse.ai.rca;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -13,6 +16,26 @@ import java.util.List;
  * injected into the AI analysis pipeline automatically.
  */
 public interface ObservabilityPlatform {
+
+    /**
+     * Short identifier for this platform (e.g. "lgtm", "elastic").
+     * Used to build prompt-override keys ({@code {platform}_{provider}_{model}})
+     * and to load platform-specific prompt fragments.
+     */
+    String platformName();
+
+    /**
+     * Platform-specific prompt fragment appended after the base system message.
+     * Loads {@code {platformName}-prompt.txt} from the classpath by default.
+     */
+    default String promptFragment() {
+        String resource = platformName() + "-prompt.txt";
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
+            return is != null ? new String(is.readAllBytes(), StandardCharsets.UTF_8) : "";
+        } catch (IOException e) {
+            return "";
+        }
+    }
 
     /**
      * Search for the most recent traces.

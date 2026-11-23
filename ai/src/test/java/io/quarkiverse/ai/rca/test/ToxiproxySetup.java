@@ -40,6 +40,7 @@ public class ToxiproxySetup {
         waitForMySql(120);
 
         docker("run", "-d", "--rm", "--name", TOXIPROXY_CONTAINER,
+                "--add-host", "host.docker.internal:host-gateway",
                 "-p", TOXIPROXY_API_PORT + ":8474",
                 "-p", PROXY_PORT + ":" + PROXY_PORT,
                 "ghcr.io/shopify/toxiproxy:2.5.0");
@@ -58,6 +59,7 @@ public class ToxiproxySetup {
         System.out.println("[TOXIPROXY] Starting Toxiproxy (weather only) ...");
 
         docker("run", "-d", "--rm", "--name", TOXIPROXY_CONTAINER,
+                "--add-host", "host.docker.internal:host-gateway",
                 "-p", TOXIPROXY_API_PORT + ":8474",
                 "-p", WEATHER_PROXY_PORT + ":" + WEATHER_PROXY_PORT,
                 "ghcr.io/shopify/toxiproxy:2.5.0");

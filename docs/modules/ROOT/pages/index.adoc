@@ -4,15 +4,27 @@ LLM-powered root-cause analysis of distributed telemetry data.
 
 == What It Is
 
-AI Root Cause Analysis (AI RCA) is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to a Grafana LGTM stack via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
+AI Root Cause Analysis (AI RCA) is a Quarkus-based system that uses LLMs to automatically analyze distributed telemetry data (traces, logs, metrics) from instrumented applications. It connects to pluggable observability platforms (Grafana LGTM, Elastic) via MCP (Model Context Protocol) clients, gathers correlated telemetry, and produces structured root-cause analysis reports.
 
 == Architecture
 
 image::architecture.svg[Architecture,width=100%]
 
-The AI module connects to your existing LGTM stack via MCP and to your running Quarkus applications via Dev MCP (for source examination and dashboard generation). Your applications just need OpenTelemetry instrumentation -- no code changes required.
+The AI module connects to your observability platform (LGTM or Elastic) via MCP and to your running Quarkus applications via Dev MCP (for source examination and dashboard generation). Your applications just need OpenTelemetry instrumentation -- no code changes required.
 
 The AI module is available as an uber-jar on Maven Central (`io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner`).
+
+== Observability Platforms
+
+[cols="1,2,2"]
+|===
+| Platform | MCP Clients | Dev Service
+
+| LGTM (default) | Tempo MCP (traces) + Grafana MCP via uvx (logs, metrics) | `quarkus-observability-devservices-lgtm`
+| Elastic | Kibana Agent Builder MCP (traces, logs, metrics via ES\|QL) | `quarkus-observability-devservices-elastic`
+|===
+
+Select with `-Dobservability.platform=lgtm` or `-Dobservability.platform=elastic` (default: `lgtm` via `.mvn/maven.config`).
 
 == Analysis Pipeline
 

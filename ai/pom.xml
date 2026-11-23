@@ -21,16 +21,20 @@
     <properties>
         <quarkus.package.jar.type>uber-jar</quarkus.package.jar.type>
         <evaluation.threshold>70</evaluation.threshold>
+        <!-- TODO [elastic-release] Remove; only needed to forward lgtm.enabled to surefire (elastic profile sets it to false) -->
+        <quarkus.observability.lgtm.enabled>true</quarkus.observability.lgtm.enabled>
+        <!-- TODO [elastic-release] Remove; only needed to forward incompatible-extensions=warn to surefire (elastic profile overrides to warn) -->
+        <quarkus.bootstrap.incompatible-extensions>error</quarkus.bootstrap.incompatible-extensions>
     </properties>
 
     <!-- ===================== -->
     <!-- Dependencies          -->
     <!-- ===================== -->
     <dependencies>
-        <!-- SPI -->
+        <!-- Common (SPI + utilities) -->
         <dependency>
             <groupId>io.quarkiverse.ai.rca</groupId>
-            <artifactId>quarkus-ai-rca-spi</artifactId>
+            <artifactId>quarkus-ai-rca-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -101,28 +105,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-runner</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${project.build.directory}/${project.build.finalName}-runner.jar</file>
-                                    <type>jar</type>
-                                    <classifier>runner</classifier>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -131,6 +113,11 @@
                     <systemPropertyVariables>
                         <integration.run>${integration.run}</integration.run>
                         <evaluation.threshold>${evaluation.threshold}</evaluation.threshold>
+                        <observability.platform>${observability.platform}</observability.platform>
+                        <!-- TODO [elastic-release] Remove; forwards lgtm.enabled=false to forked test JVM when elastic profile is active -->
+                        <quarkus.observability.lgtm.enabled>${quarkus.observability.lgtm.enabled}</quarkus.observability.lgtm.enabled>
+                        <!-- TODO [elastic-release] Remove; forwards incompatible-extensions=warn to forked test JVM for 999-SNAPSHOT modules -->
+                        <quarkus.bootstrap.incompatible-extensions>${quarkus.bootstrap.incompatible-extensions}</quarkus.bootstrap.incompatible-extensions>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -164,6 +151,66 @@
                 <dependency>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-observability-devservices-lgtm</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>elastic</id>
+            <activation>
+                <property>
+                    <name>observability.platform</name>
+                    <value>elastic</value>
+                </property>
+            </activation>
+            <!--
+                TODO [elastic-release] Remove these two properties when Elastic Dev Services ship in a Quarkus release.
+                - incompatible-extensions=warn: suppresses version-range check for 999-SNAPSHOT modules
+                - lgtm.enabled=false: prevents LGTM dev service from starting alongside Elastic
+            -->
+            <properties>
+                <quarkus.bootstrap.incompatible-extensions>warn</quarkus.bootstrap.incompatible-extensions>
+                <quarkus.observability.lgtm.enabled>false</quarkus.observability.lgtm.enabled>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkiverse.ai.rca</groupId>
+                    <artifactId>quarkus-ai-rca-elastic</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <!--
+                    TODO [elastic-release] Remove explicit versions below; they will come from the Quarkus BOM.
+                    Currently overridden to 999-SNAPSHOT because the released BOM does not include them yet.
+                -->
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-elastic</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-testcontainers</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devresource-testcontainers</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devservices-common</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-observability-devresource-common</artifactId>
+                    <version>${quarkus.observability.elastic.version}</version>
                 </dependency>
             </dependencies>
         </profile>

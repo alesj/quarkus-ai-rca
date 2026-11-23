@@ -5,7 +5,7 @@
 * JDK 21+
 * Maven 3.9+ (or use the included `mvnw` wrapper)
 * Docker (for LGTM stack via Dev Services)
-* https://docs.astral.sh/uv/[uvx] -- used to run the `mcp-grafana` MCP server (`pip install uv` or `brew install uv`)
+* https://docs.astral.sh/uv/[uvx] -- used to run the `mcp-grafana` MCP server for LGTM (`pip install uv` or `brew install uv`); not needed for Elastic
 * API key for at least one LLM provider (OpenAI or Grok)
 
 == Quick Start
@@ -36,6 +36,16 @@ The AI module uses property-activated Maven profiles to select the LLM provider 
 ./mvn.ai.sh quarkus:dev -Dllm.provider=watsonx # WatsonX
 ----
 
+=== Observability Platform Selection
+
+[source,bash]
+----
+./mvn.ai.sh quarkus:dev -Dobservability.platform=lgtm     # Grafana LGTM (default)
+./mvn.ai.sh quarkus:dev -Dobservability.platform=elastic   # Elastic (ES + Kibana + APM)
+----
+
+Both can be combined: `-Dllm.provider=grok -Dobservability.platform=elastic`.
+
 === Environment Variables
 
 Set the API key for your chosen provider:
@@ -59,30 +69,66 @@ curl http://localhost:8080/analyze/5   # analyze last 5 traces
 
 == Production Mode (Uber-jar)
 
-The uber-jar is published to Maven Central -- you don't need to clone the repo. Download it and run directly:
+Pre-built runner JARs are published to https://github.com/quarkiverse/quarkus-ai-rca/packages[GitHub Packages] for each combination of observability platform and LLM provider.
+You don't need to clone the repo -- download and run directly.
+
+=== Available Variants
+
+[cols="1,1,1"]
+|===
+| Platform | LLM | Classifier
+
+| LGTM | OpenAI | `lgtm-openai`
+| LGTM | Gemini | `lgtm-gemini`
+| LGTM | WatsonX | `lgtm-watsonx`
+| Elastic | OpenAI | `elastic-openai`
+| Elastic | Gemini | `elastic-gemini`
+| Elastic | WatsonX | `elastic-watsonx`
+|===
+
+Grok (xAI) reuses the OpenAI runner with a different base URL -- use the `openai` variant and set `GROK_API_KEY`.
+
+=== Download
+
+Replace `VERSION` with the release version and `CLASSIFIER` with the desired variant (e.g. `lgtm-openai`):
 
 [source,bash]
 ----
-# Option 1: Download via Maven
-mvn dependency:copy -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-core:RELEASE:jar:runner -DoutputDirectory=.
+mvn dependency:copy \
+  -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-runner:VERSION:jar:CLASSIFIER \
+  -DremoteRepositories=github::default::https://maven.pkg.github.com/quarkiverse/quarkus-ai-rca \
+  -DoutputDirectory=.
+----
 
-# Option 2: Download via curl (replace VERSION with the latest release)
-curl -O https://repo1.maven.org/maven2/io/quarkiverse/ai/rca/quarkus-ai-rca-core/VERSION/quarkus-ai-rca-core-VERSION-runner.jar
+=== Run against LGTM
 
-# Run against your LGTM stack
+[source,bash]
+----
 java -Dgrafana.endpoint=http://localhost:3000 \
      -Dtempo-mcp.endpoint=http://localhost:3200 \
      -Dapp.ports=8081,8082 \
-     -jar quarkus-ai-rca-core-*-runner.jar
+     -jar quarkus-ai-rca-runner-*-lgtm-openai.jar
+----
+
+=== Run against Elastic
+
+[source,bash]
+----
+java -Delasticsearch.endpoint=http://localhost:9200 \
+     -Dkibana.endpoint=http://localhost:5601 \
+     -Dapp.ports=8081,8082 \
+     -jar quarkus-ai-rca-runner-*-elastic-openai.jar
 ----
 
 The `-Dapp.ports` argument is optional -- it lists the ports of your running Quarkus applications in dev mode for source examination and dashboard generation. Omit it if you only need the core analysis (traces, logs, metrics).
 
-Alternatively, if you've cloned the repo, you can build and run locally:
+=== Build Locally
+
+If you've cloned the repo, you can build a runner JAR for any platform/LLM combination:
 
 [source,bash]
 ----
-./mvn.ai.sh package -DskipTests
+./mvn.ai.sh package -DskipTests -Dobservability.platform=lgtm -Dllm.provider=openai
 ./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082
 ----
 
@@ -108,6 +154,25 @@ Then run the AI module with the `lgtm` profile:
 [source,bash]
 ----
 ./mvn.ai.sh quarkus:dev -Dquarkus.profile=lgtm,openai
+----
+
+== Manual Elastic (without DevServices)
+
+To connect to an externally started Elastic stack:
+
+[source,bash]
+----
+./mvn.ai.sh quarkus:dev -Dobservability.platform=elastic -Dquarkus.profile=elastic,openai
+----
+
+Key properties for manual connection:
+
+[source,properties]
+----
+%elastic.quarkus.observability.enabled=false
+%elastic.elasticsearch.endpoint=http://localhost:9200
+%elastic.kibana.endpoint=http://localhost:5601
+%elastic.apm-server.url=localhost:8200
 ----
 
 == Trying It with Example Apps

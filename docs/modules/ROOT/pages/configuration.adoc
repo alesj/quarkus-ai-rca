@@ -54,7 +54,9 @@ export SCORER_MODEL=grok-3-mini
 
 == MCP Client Configuration
 
-=== Tempo MCP
+The MCP client setup depends on the selected observability platform.
+
+=== LGTM: Tempo MCP
 
 Connects to Tempo via streamable HTTP for trace retrieval:
 
@@ -64,7 +66,7 @@ quarkus.langchain4j.mcp.tempo.transport-type=streamable-http
 quarkus.langchain4j.mcp.tempo.url=${tempo-mcp.endpoint}/api/mcp
 ----
 
-=== Grafana MCP
+=== LGTM: Grafana MCP
 
 Connects to Grafana via stdio process for Loki logs and Prometheus metrics:
 
@@ -75,11 +77,25 @@ quarkus.langchain4j.mcp.grafana.command=uvx,mcp-grafana
 quarkus.langchain4j.mcp.grafana.environment.GRAFANA_URL=${grafana.endpoint}
 ----
 
+=== Elastic: Kibana MCP
+
+Connects to Kibana's Agent Builder MCP endpoint for traces, logs, and metrics via ES|QL. A single MCP client replaces the separate Tempo + Grafana clients used by LGTM. The MCP URL is derived from `kibana.endpoint` (appends `/api/agent_builder/mcp`):
+
+[source,properties]
+----
+kibana.endpoint=http://localhost:5601
+# elastic.mcp.api-key=<base64-encoded-id:key>  # optional, for secured clusters
+----
+
+The Dev Service (`quarkus-observability-devservices-elastic`) automatically injects `kibana.endpoint` -- manual configuration is only needed when connecting to an external Elastic stack.
+
 == Application Port
 
 The AI module runs on port 8080 by default. The `app.ports` property configures which of your application ports to connect to via Dev MCP for source examination and dashboard generation.
 
-== LGTM Profile
+== Platform Profiles
+
+=== LGTM Profile
 
 For manual LGTM connection (without DevServices), use the `lgtm` profile. Key properties:
 
@@ -92,3 +108,17 @@ For manual LGTM connection (without DevServices), use the `lgtm` profile. Key pr
 ----
 
 LGTM Docker ports: Grafana=3000, OTLP gRPC=4317, OTLP HTTP=4318, Tempo=3200.
+
+=== Elastic Profile
+
+For manual Elastic connection (without DevServices), use the `elastic` profile:
+
+[source,properties]
+----
+%elastic.quarkus.observability.enabled=false
+%elastic.elasticsearch.endpoint=http://localhost:9200
+%elastic.kibana.endpoint=http://localhost:5601
+%elastic.apm-server.url=localhost:8200
+----
+
+Elastic Docker ports: Elasticsearch=9200, Kibana=5601, APM Server=8200, OTLP gRPC=4317, OTLP HTTP=4318.

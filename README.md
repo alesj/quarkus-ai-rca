@@ -3,15 +3,15 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.ai.rca/quarkus-ai-rca-core.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.ai.rca/quarkus-ai-rca-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-LLM-powered Root Cause Analysis of distributed systems using Quarkus, LangChain4j, and Grafana LGTM via MCP.
+LLM-powered Root Cause Analysis of distributed systems using Quarkus, LangChain4j, and pluggable observability platforms (Grafana LGTM, Elastic) via MCP.
 
 For detailed documentation, see the [docs](docs/modules/ROOT/pages/index.adoc).
 
 ## Requirements
 
 * **Java 21+** and **Maven 3.9+** (or use the included `./mvnw` wrapper)
-* **Docker** or **Podman** — Quarkus Dev Services automatically starts LGTM (Grafana, Tempo, Loki, Prometheus), MySQL, and Toxiproxy containers
-* **[uvx](https://docs.astral.sh/uv/)** — used to run the `mcp-grafana` MCP server (`pip install uv` or `brew install uv`)
+* **Docker** or **Podman** — Quarkus Dev Services automatically starts the observability stack (LGTM or Elastic), MySQL, and Toxiproxy containers
+* **[uvx](https://docs.astral.sh/uv/)** — used to run the `mcp-grafana` MCP server for LGTM (`pip install uv` or `brew install uv`); not needed for Elastic
 * **LLM API key** — at least one of: `OPENAI_API_KEY`, `GROK_API_KEY`, `GEMINI_API_KEY`, or `WATSONX_API_KEY`
 
 ## How to run / test the AI part
@@ -32,7 +32,9 @@ In (3) you can select the LLM provider via `-Dllm.provider=<name>` (defaults to 
 * `-Dllm.provider=watsonx` - WatsonX
 * `-Dllm.provider=gemini` - Gemini
 
-Similarly, the observability platform is selected via `-Dobservability.platform=<name>` (defaults to `lgtm`).
+Similarly, the observability platform is selected via `-Dobservability.platform=<name>` (defaults to `lgtm`):
+* `-Dobservability.platform=lgtm` - Grafana LGTM (default) — Tempo + Grafana MCP
+* `-Dobservability.platform=elastic` - Elastic — Kibana Agent Builder MCP
 
 Each value activates the corresponding Maven profile, which sets `quarkus.profile` and pulls in the right dependencies.
 
@@ -102,14 +104,53 @@ To quickly start just the AI module with Dev Services (LGTM auto-starts):
 
 This runs the AI module in Quarkus dev mode, automatically starting LGTM via Dev Services. The ports argument is optional — it tells the AI module which application ports to connect to via Dev MCP for source examination and writing dashboards into your app sources. The target applications must be running in Quarkus dev mode (which exposes the Dev MCP endpoint).
 
-For production use with an existing LGTM instance, use the pre-built uber-jar:
+For production use with an existing observability stack, use a pre-built uber-jar.
+
+Pre-built runner JARs are published to [GitHub Packages](https://github.com/quarkiverse/quarkus-ai-rca/packages) for each combination of observability platform and LLM provider:
+
+| Platform | LLM | Classifier |
+|---|---|---|
+| LGTM | OpenAI | `lgtm-openai` |
+| LGTM | Gemini | `lgtm-gemini` |
+| LGTM | WatsonX | `lgtm-watsonx` |
+| Elastic | OpenAI | `elastic-openai` |
+| Elastic | Gemini | `elastic-gemini` |
+| Elastic | WatsonX | `elastic-watsonx` |
+
+Grok (xAI) reuses the OpenAI runner with a different base URL — use the `openai` variant and set `GROK_API_KEY`.
+
+Download a runner JAR (replace `VERSION` and `CLASSIFIER`):
 
 ```bash
+mvn dependency:copy \
+  -Dartifact=io.quarkiverse.ai.rca:quarkus-ai-rca-runner:VERSION:jar:CLASSIFIER \
+  -DremoteRepositories=github::default::https://maven.pkg.github.com/quarkiverse/quarkus-ai-rca \
+  -DoutputDirectory=.
+```
+
+Run against your LGTM stack:
+
+```bash
+java -Dgrafana.endpoint=http://localhost:3000 \
+     -Dtempo-mcp.endpoint=http://localhost:3200 \
+     -jar quarkus-ai-rca-runner-*-lgtm-openai.jar
+```
+
+Run against your Elastic stack:
+
+```bash
+java -Delasticsearch.endpoint=http://localhost:9200 \
+     -Dkibana.endpoint=http://localhost:5601 \
+     -jar quarkus-ai-rca-runner-*-elastic-openai.jar
+```
+
+Or build and run locally:
+
+```bash
+./mvn.ai.sh package -DskipTests
 ./run-ai.sh http://localhost:3000 http://localhost:3200              # analysis only
 ./run-ai.sh http://localhost:3000 http://localhost:3200 8081,8082    # with app ports
 ```
-
-The uber-jar can also be downloaded from [Maven Central](https://central.sonatype.com/search?q=quarkus-ai-rca-core) as `io.quarkiverse.ai.rca:quarkus-ai-rca-core:<version>:jar:runner`.
 
 ### Manual LGTM (without DevServices)
 
@@ -174,11 +215,13 @@ The script takes up to three arguments:
 ./run-integration-test.sh weather openai grok   # weather, AI=openai, scorer=grok
 ```
 
-Run all provider combinations for a test type:
+Run all test types (chaos, db, weather) for a given platform and AI combo:
 ```bash
-./run-all-integration-tests.sh chaos            # all 4 combos for chaos
-./run-all-integration-tests.sh db               # all 4 combos for db
-./run-all-integration-tests.sh weather          # all 4 combos for weather
+./run-all-integration-tests.sh <platform> <ai> <scorer>
+
+./run-all-integration-tests.sh elastic openai grok   # Elastic, AI=openai, scorer=grok
+./run-all-integration-tests.sh elastic grok openai   # Elastic, AI=grok, scorer=openai
+./run-all-integration-tests.sh lgtm openai grok      # LGTM, AI=openai, scorer=grok
 ```
 
 Supported AI profiles: `openai`, `grok`, `gemini`, `watsonx`.

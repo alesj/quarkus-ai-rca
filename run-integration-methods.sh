@@ -117,13 +117,16 @@ if [ -n "${EVALUATION_THRESHOLD:-}" ]; then
   THRESHOLD_ARG="-Devaluation.threshold=$EVALUATION_THRESHOLD"
 fi
 
+PLATFORM="${OBSERVABILITY_PLATFORM:-lgtm}"
+
 echo "=== Running $TEST_CLASS ==="
 echo "  Test type: $TEST_TYPE"
 echo "  AI profile: $PROFILE"
 echo "  Scorer: ${SCORER:-openai (default)}"
+echo "  Platform: $PLATFORM"
 echo "  Threshold: ${EVALUATION_THRESHOLD:-70 (default)}"
 echo "  Methods: $METHODS"
 echo ""
 
-./mvnw clean test -pl ai --also-make -Dllm.provider="$PROFILE" -Dintegration.run=true \
+./mvnw clean test -pl ai --also-make -Dllm.provider="$PROFILE" -Dobservability.platform="$PLATFORM" -Dintegration.run=true \
   -Dtest="${TEST_CLASS}#${METHODS}" -Dsurefire.failIfNoSpecifiedTests=false $THRESHOLD_ARG

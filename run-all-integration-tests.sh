@@ -3,40 +3,51 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-TEST_TYPE="${1:-chaos}"
+PLATFORM="${1:-lgtm}"
+AI="${2:-openai}"
+SCORER="${3:-grok}"
 
-CONFIGS=(
-  "openai openai"
-  "grok openai"
-  "openai grok"
-  "grok grok"
-)
+TESTS=(chaos db weather)
 
-FAILED=()
+PASS=0
+FAIL=0
+RESULTS=""
 
-for config in "${CONFIGS[@]}"; do
-  read -r ai scorer <<< "$config"
-  echo "=========================================="
-  echo " Running: TYPE=$TEST_TYPE AI=$ai SCORER=$scorer"
-  echo "=========================================="
-  if "$SCRIPT_DIR/run-integration-test.sh" "$TEST_TYPE" "$ai" "$scorer"; then
-    echo "PASSED: TYPE=$TEST_TYPE AI=$ai SCORER=$scorer"
-  else
-    echo "FAILED: TYPE=$TEST_TYPE AI=$ai SCORER=$scorer"
-    FAILED+=("TYPE=$TEST_TYPE AI=$ai SCORER=$scorer")
-  fi
+echo "=========================================="
+echo " Integration Test Suite"
+echo "  Platform: $PLATFORM"
+echo "  AI: $AI"
+echo "  Scorer: $SCORER"
+echo "=========================================="
+echo ""
+
+for TEST in "${TESTS[@]}"; do
   echo ""
+  echo "=========================================="
+  echo " Running: $TEST | AI=$AI | SCORER=$SCORER | Platform=$PLATFORM"
+  echo "=========================================="
+
+  docker rm -f chaos-toxiproxy chaos-mysql chaos-weather 2>/dev/null || true
+
+  if OBSERVABILITY_PLATFORM="$PLATFORM" "$SCRIPT_DIR/run-integration-test.sh" "$TEST" "$AI" "$SCORER"; then
+    PASS=$((PASS + 1))
+    RESULTS="${RESULTS}\n  PASS: $TEST"
+  else
+    FAIL=$((FAIL + 1))
+    RESULTS="${RESULTS}\n  FAIL: $TEST"
+  fi
 done
 
+TOTAL=$((PASS + FAIL))
+
+echo ""
 echo "=========================================="
-echo " Summary"
+echo " Summary: $PASS/$TOTAL passed"
+echo "  Platform: $PLATFORM | AI: $AI | Scorer: $SCORER"
 echo "=========================================="
-if [ ${#FAILED[@]} -eq 0 ]; then
-  echo "All ${#CONFIGS[@]} configurations passed."
-else
-  echo "${#FAILED[@]} of ${#CONFIGS[@]} configurations failed:"
-  for f in "${FAILED[@]}"; do
-    echo "  - $f"
-  done
+echo -e "$RESULTS"
+echo ""
+
+if [ "$FAIL" -gt 0 ]; then
   exit 1
 fi

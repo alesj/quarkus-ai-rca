@@ -31,6 +31,16 @@ public class CompanionApps {
                 "-Dquarkus.http.port=" + port,
                 "-Dquarkus.console.enabled=false",
                 "-Dquarkus.test.continuous-testing=disabled"));
+
+        String platform = System.getProperty("observability.platform");
+        if (platform != null) {
+            command.add("-Dobservability.platform=" + platform);
+            // TODO [elastic-release] Remove; prevents LGTM dev service from starting alongside Elastic
+            if ("elastic".equals(platform)) {
+                command.add("-Dquarkus.observability.lgtm.enabled=false");
+            }
+        }
+
         for (String prop : extraProps) {
             command.add("-D" + prop);
         }

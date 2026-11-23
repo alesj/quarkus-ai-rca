@@ -30,8 +30,9 @@
     <!-- Modules               -->
     <!-- ===================== -->
     <modules>
-        <module>spi</module>
+        <module>common</module>
         <module>lgtm</module>
+        <module>elastic</module>
         <module>ai</module>
     </modules>
 
@@ -50,6 +51,12 @@
 
         <!-- LangChain4j directly, when needed -->
         <quarkus.langchain4j.version>2.0.0.Beta4</quarkus.langchain4j.version>
+
+        <!--
+            TODO [elastic-release] Remove when Elastic Observability Dev Services ship in a Quarkus release.
+            Until then we use a local 999-SNAPSHOT build of quarkus-observability-devservices-elastic and friends.
+        -->
+        <quarkus.observability.elastic.version>999-SNAPSHOT</quarkus.observability.elastic.version>
 
         <!-- Resiliency Testing -->
         <quarkus.resiliency-testing.version>0.6.0</quarkus.resiliency-testing.version>
